@@ -3,7 +3,6 @@ function showRAM(title, RAM, heightPos) {
     heightMargin = windowHeight * 0.04 + heightPos;
     width = windowWidth - widthMargin * 2;
     fill(0);
-    rect(widthMargin-1, heightMargin-1, width+2, 40)
     fill(255);
     rect(widthMargin, heightMargin, width, 20);
     fill(0);
@@ -185,8 +184,6 @@ function showInfoTable(title, info, widthPos, heightPos) {
     heightPos += 30;
     heightPos += 10;
 
-
-
     fill(255);
     rect(widthPos, heightPos, width/2, 18);
     fill(0);
@@ -195,8 +192,6 @@ function showInfoTable(title, info, widthPos, heightPos) {
     text("Pages", widthPos + width/4, heightPos + 13);
 
     thrasingPercent = info.TrashingTime / info.simulationTime * 100;
-
-    print(thrasingPercent);
 
     var color1 = "";
     var color2 = "";
