@@ -6,3 +6,27 @@ html, body {
 canvas {
   display: block;
 }
+
+.table {
+  position: absolute;
+  /* background-color: aqua; */
+  width: 500;
+  height: 100;
+  overflow: hidden;
+}
+
+table,
+td {
+    border: 1px solid #333;
+    background: #000;
+    color: #fff;
+}
+
+thead,
+tfoot {
+    background-color: #333;
+    color: #fff;
+}
+
+/* #ram1 {
+} */

@@ -51,7 +51,7 @@ algorithmInfo = {
 let img;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(300, 200);
   for (let i = 0; i < 100; i++) {
     optimalRAM.push({pageId: i, lAddr: i, color: getRandomColor()});
     algorithmRAM.push({pageId: i, lAddr: i, color: getRandomColor()});
@@ -59,18 +59,52 @@ function setup() {
   pagesTableOptRAM = example;
 }
 
+function draw() {
+  background(0);
+  fill(255);
+  ellipse(50,20,50,50);
+}
+
 function preload() {
   img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
 }
 
-function draw() {
-  background(255);
-  imageMode(CENTER);
-  image(img, windowWidth/2, windowHeight/2, 550, 400);
-  showRAM("RAM - OPT", optimalRAM, 0);
-  showRAM("RAM - ALG", algorithmRAM, 60);
-  showTable(pagesTableOptRAM, 0);
+const RAM1 = function (p) {
+
+  p.setup = function () {
+    p.createCanvas(p.windowWidth, 300);
+    p.background(200);
+  }
+
+  p.draw = function () {
+    p.rect(5,5,300,100);
+    showRAM("Optimal", RAM, 0, p.windowWidth, p.windowHeight);
+  }
 }
+
+let ram1 = new p5(RAM1, 'ram1');
+
+// function draw() {
+//   background(255);
+//   imageMode(CENTER);
+//   image(img, windowWidth/2, windowHeight/2, 550, 400);
+//   showRAM("RAM - OPT", optimalRAM, 0);
+//   showRAM("RAM - ALG", algorithmRAM, 60);
+//   showTable(pagesTableOptRAM, 0);
+// }
+
+// function sketch_idnameofdiv(p) {
+//   p.setup = function () {
+//     p.createCanvas(300,600);
+//   }
+
+//   p.draw = function () {
+//     // stuff to draw
+//   }
+// }
+// new p5(sketch_idnameofdiv, 'idnameofdiv')
+
+
 
 function getRandomColor() {
   while (true) {
