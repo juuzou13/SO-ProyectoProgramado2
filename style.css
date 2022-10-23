@@ -7,19 +7,12 @@ canvas {
   display: block;
 }
 
-.table {
-  position: absolute;
-  /* background-color: aqua; */
-  width: 500;
-  height: 100;
-  overflow: hidden;
-}
-
 table,
 td {
     border: 1px solid #333;
     color: #000;
     font-size: 13px;
+    padding: 0px 5px 0px 5px;
 }
 
 thead{
@@ -30,14 +23,12 @@ thead{
 
 tr, th {
   text-align: center;
+  border-spacing:15px 10px;
 }
 
 .table-scroll {
   height:300px;
   overflow:auto;  
   margin-top:20px;
-}
-
-#1 {
-  width: 200px;
+  background-color: #fff;
 }

@@ -1,5 +1,7 @@
 pagesTableOptRAM = [];
 pagesTableAlgRAM = [];
+tableOpt = [];
+tableAlg = [];
 
 diskPagesOptRAM = [];
 diskPagesAlgRAM = [];
@@ -57,9 +59,9 @@ function setup() {
     algorithmRAM.push({pageId: i, lAddr: i, color: getRandomColor()});
   }
   pagesTableOptRAM = example;
-  // showRAM("RAM - OPT", optimalRAM, 0);
-  // showRAM("RAM - ALG", algorithmRAM, 60);
-  showTable("RAM - OPT", pagesTableOptRAM, 0);
+  pagesTableAlgRAM = example;
+  tableOpt = generateTable("RAM - OPT", pagesTableOptRAM,  windowWidth * 0.15, 150);
+  tableAlg = generateTable("RAM - ALG", pagesTableAlgRAM, windowWidth * 0.1 + 675, 150);
 }
 
 function preload() {
@@ -70,6 +72,10 @@ function draw() {
   background(255);
   imageMode(CENTER);
   image(img, windowWidth/2, windowHeight/2, 550, 400);
+  showRAM("RAM - OPT", optimalRAM, 0);
+  showRAM("RAM - ALG", algorithmRAM, 60);
+  tableOpt.html(generateHtmlTableInfo("RAM - OPT", pagesTableOptRAM));
+  tableAlg.html(generateHtmlTableInfo("RAM - ALG", pagesTableAlgRAM));
 }
 
 function getRandomColor() {
