@@ -1,3 +1,5 @@
+RAMsize = 400;
+
 pagesTableOptRAM = [];
 pagesTableAlgRAM = [];
 tableOpt = [];
@@ -10,25 +12,25 @@ optimalRAM = [];
 algorithmRAM = [];
 
 optimalInfo = {
-  process: 0,
-  simulationTime: 0,
-  RAMused: 0,
-  VRAMused: 0,
-  PagesLoaded: 0,
-  PagesUnloaded: 0,
-  TrashingTime: 0,
-  Fragmentation: 0,
+  process: 5,
+  simulationTime: 250,
+  RAMused: 300,
+  VRAMused: 600,
+  PagesLoaded: 81,
+  PagesUnloaded: 90,
+  TrashingTime: 100,
+  Fragmentation: 273,
 }
 
 algorithmInfo = {
-  process: 0,
-  simulationTime: 0,
-  RAMused: 0,
-  VRAMused: 0,
-  PagesLoaded: 0,
-  PagesUnloaded: 0,
-  TrashingTime: 0,
-  Fragmentation: 0,
+  process: 7,
+  simulationTime: 400,
+  RAMused: 200,
+  VRAMused: 346,
+  PagesLoaded: 83,
+  PagesUnloaded: 60,
+  TrashingTime: 300,
+  Fragmentation: 172,
 }
 
 // page = {
@@ -71,11 +73,13 @@ function preload() {
 function draw() {
   background(255);
   imageMode(CENTER);
-  image(img, windowWidth/2, windowHeight/2, 550, 400);
+  image(img, 200, 600, 350, 250);
   showRAM("RAM - OPT", optimalRAM, 0);
   showRAM("RAM - ALG", algorithmRAM, 60);
   tableOpt.html(generateHtmlTableInfo("RAM - OPT", pagesTableOptRAM));
   tableAlg.html(generateHtmlTableInfo("RAM - ALG", pagesTableAlgRAM));
+  showInfoTable("RAM - OPT", optimalInfo, 300, 510);
+  showInfoTable("RAM - ALG", algorithmInfo, 900, 510);
 }
 
 function getRandomColor() {
