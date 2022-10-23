@@ -16,13 +16,11 @@ function showRAM(title, RAM, heightPos) {
     }
 }
 
-function showTable(table, heightPos) {
+function showTable(title, table, heightPos) {
     html = 
     "<table>"+
     "<thead>"+
-        "<tr>"+
-            "<th colspan='2'>The table header</th>"+
-        "</tr>"+
+            `<td id='1'>${title}</td>`+
     "</thead>"+
     "<tbody>"+
         "<tr>"+
@@ -34,11 +32,30 @@ function showTable(table, heightPos) {
             "<td>D-ADDR</td>"+
             "<td>LOADED-T</td>"+
             "<td>MARK</td>"+
-        "</tr>"+
-    "</tbody>"+
-    "</table>";
+        "</tr>";
+    for (let i = 0; i < table.length; i++) {
+        html += `<tr bgcolor='${table[i].color}'>`+
+                "<td>"+table[i].pageId+"</td>"+
+                "<td>"+table[i].processId+"</td>";
+        if (table[i].loaded) {
+            html += "<td>X</td>";
+        } else {
+            html += "<td></td>";
+        }
+        html += "<td>"+table[i].lAddr+"</td>"+
+                "<td>"+table[i].mAddr+"</td>"+
+                "<td>"+table[i].dAddr+"</td>"+
+                "<td>"+table[i].loadedTime+"</td>";
+        if (table[i].mark) {
+            html += "<td>X</td>";
+        } else {
+            html += "<td></td>";
+        }
+        html += "</tr>";
+    }
+    html += "</tbody>"+"</table>";
     divTable = createDiv("");
-    divTable.position(100, windowHeight/3+ heightPos);
-    divTable.class("table");
+    divTable.position(100, 150 + heightPos);
+    divTable.class("table-scroll");
     divTable.html(html);
 }
