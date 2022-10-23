@@ -62,8 +62,8 @@ function setup() {
   }
   pagesTableOptRAM = example;
   pagesTableAlgRAM = example;
-  tableOpt = generateTable("RAM - OPT", pagesTableOptRAM,  windowWidth * 0.15, 150);
-  tableAlg = generateTable("RAM - ALG", pagesTableAlgRAM, windowWidth * 0.1 + 675, 150);
+  tableOpt = generateTable("RAM - OPT", pagesTableOptRAM,  windowWidth * 0.14, windowHeight * 0.23);
+  tableAlg = generateTable("RAM - ALG", pagesTableAlgRAM, windowWidth * 0.54, windowHeight * 0.23);
 }
 
 function preload() {
@@ -78,8 +78,8 @@ function draw() {
   showRAM("RAM - ALG", algorithmRAM, 60);
   tableOpt.html(generateHtmlTableInfo("RAM - OPT", pagesTableOptRAM));
   tableAlg.html(generateHtmlTableInfo("RAM - ALG", pagesTableAlgRAM));
-  showInfoTable("RAM - OPT", optimalInfo, 300, 510);
-  showInfoTable("RAM - ALG", algorithmInfo, 900, 510);
+  showInfoTable("RAM - OPT", optimalInfo, windowWidth * 0.14, windowHeight * 0.65);
+  showInfoTable("RAM - ALG", algorithmInfo, windowWidth * 0.54, windowHeight * 0.65);
 }
 
 function getRandomColor() {
@@ -95,6 +95,12 @@ function getRandomColor() {
   }
 
   return color;
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  tableOpt.position(windowWidth * 0.14, windowHeight * 0.23);
+  tableAlg.position(windowWidth * 0.54, windowHeight * 0.23);
 }
 
 example = [

@@ -13,6 +13,7 @@ td {
     color: #000;
     font-size: 13px;
     padding: 0px 5px 0px 5px;
+    text-align: center;
 }
 
 thead{
@@ -27,8 +28,7 @@ tr, th {
 }
 
 .table-scroll {
-  height:300px;
+  height: 35vh;
   overflow:auto;  
-  margin-top:20px;
   background-color: #fff;
 }
