@@ -89,16 +89,17 @@ let img;
 const white = "#FFFFFF";
 
 function setup() {
-  runOpt();
   createCanvas(windowWidth, windowHeight);
   for (let i = 0; i < computer.framesQuantity; i++) {
-    optimalRAM.push({frameNumber: i, pageId:-1, occupied: 0, color: white});
-    algorithmRAM.push({frameNumber: i, pageId:-1, occupied: 0, color: white});
+    optimalRAM.push({frameNumber: i, pageId:-1, color: white});
+    algorithmRAM.push({frameNumber: i, pageId:-1, color: white});
   }
   pagesTableOptRAM = optimalPages;
   pagesTableAlgRAM = ramPages;
   mmuOpt = generateTable("MMU - OPT", pagesTableOptRAM,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", pagesTableAlgRAM, windowWidth * 0.1 + 675, 150);
+  runOpt();
+
 }
 
 
