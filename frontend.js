@@ -165,7 +165,7 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.RAMused / RAMsize * 100}%`, widthPos + width/4 + width/8, heightPos + 20);
+    text(`${info.RAMused / computer.ramSize * 100}%`, widthPos + width/4 + width/8, heightPos + 20);
 
     fill(255);
     rect(widthPos + width/2, heightPos, width/4, 30);
@@ -179,7 +179,7 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.VRAMused / RAMsize * 100}%`, widthPos + width/4 * 3 + width/8, heightPos + 20);
+    text(`${info.VRAMused / computer.ramSize * 100}%`, widthPos + width/4 * 3 + width/8, heightPos + 20);
 
     heightPos += 30;
     heightPos += 10;
@@ -190,8 +190,12 @@ function showInfoTable(title, info, widthPos, heightPos) {
     textSize(11);
     textAlign(CENTER);
     text("Pages", widthPos + width/4, heightPos + 13);
-
-    thrasingPercent = info.TrashingTime / info.simulationTime * 100;
+    
+    if(info.simulationTime == 0) {
+        thrasingPercent = 0;
+    }else{
+        thrasingPercent = info.TrashingTime / info.simulationTime * 100;
+    }
 
     var color1 = "";
     var color2 = "";

@@ -1,25 +1,37 @@
-RAMsize = 400;
+//Computer Specifications
+
+computer = {
+  cores: 1,
+  instructionsPSec: 1,
+  diskAccessTime: 5,
+  ramSize: 400,
+  diskSize: Number.MAX_SAFE_INTEGER,
+  pageSize: 4,
+  framesQuantity: 400 / 4,
+}
 
 pagesTableOptRAM = [];
 pagesTableAlgRAM = [];
-tableOpt = [];
-tableAlg = [];
+mmuOpt = [];
+mmuAlg = [];
 
 diskPagesOptRAM = [];
 diskPagesAlgRAM = [];
 
 optimalRAM = [];
+optimalRAMFramesLeft = computer.framesQuantity;
 algorithmRAM = [];
+algorithmRAMFramesLeft = computer.framesQuantity;
 
 optimalInfo = {
-  process: 5,
-  simulationTime: 250,
-  RAMused: 300,
-  VRAMused: 600,
-  PagesLoaded: 81,
-  PagesUnloaded: 90,
-  TrashingTime: 100,
-  Fragmentation: 273,
+  process: 0,
+  simulationTime: 0,
+  RAMused: 0,
+  VRAMused: 0,
+  PagesLoaded: 0,
+  PagesUnloaded: 0,
+  TrashingTime: 0,
+  Fragmentation: 0,
 }
 
 algorithmInfo = {
@@ -33,6 +45,27 @@ algorithmInfo = {
   Fragmentation: 172,
 }
 
+ramPages=[];
+optimalPages = [/*
+  { pageId: 0, processId: 0, loaded: false, lAddr: 0, mAddr: -1, dAddr: 0, loadedTime: 0, mark: false, processSize: 500, color: "#16697A" },
+  { pageId: 1, processId: 0, loaded: true, lAddr: 1, mAddr: 0, dAddr: -1, loadedTime: 14, mark: false, processSize: 355, color: "#16697A" },
+  { pageId: 2, processId: 0, loaded: false, lAddr: 2, mAddr: -1, dAddr: 1, loadedTime: 5, mark: false, processSize: 653, color: "#16697A" },
+  { pageId: 3, processId: 1, loaded: true, lAddr: 3, mAddr: 1, dAddr: -1, loadedTime: 143, mark: false, processSize: 655, color: "#FFA62B" },
+  { pageId: 4, processId: 1, loaded: false, lAddr: 4, mAddr: -1, dAddr: 2, loadedTime: 6, mark: false, processSize: 123, color: "#FFA62B" },
+  { pageId: 5, processId: 1, loaded: true, lAddr: 5, mAddr: 2, dAddr: -1, loadedTime: 7, mark: false, processSize: 324, color: "#FFA62B" },
+  { pageId: 6, processId: 2, loaded: true, lAddr: 6, mAddr: 3, dAddr: -1, loadedTime: 9, mark: false, processSize: 512, color: "#B7245C" },
+  { pageId: 7, processId: 2, loaded: false, lAddr: 7, mAddr: -1, dAddr: 3, loadedTime: 23, mark: false, processSize: 1024, color: "#B7245C" },
+  { pageId: 8, processId: 2, loaded: true, lAddr: 8, mAddr: 4, dAddr: -1, loadedTime: 11, mark: false, processSize: 2048, color: "#B7245C" },
+  { pageId: 9, processId: 1, loaded: true, lAddr: 9, mAddr: 5, dAddr: -1, loadedTime: 54, mark: false, processSize: 783, color: "#FFA62B" },
+  { pageId: 10, processId: 3, loaded: false, lAddr: 10, mAddr: -1, dAddr: 4, loadedTime: 67, mark: false, processSize: 236, color: "#002500" },
+  { pageId: 11, processId: 3, loaded: false, lAddr: 11, mAddr: -1, dAddr: 5, loadedTime: 21, mark: false, processSize: 13, color: "#002500" },
+  { pageId: 12, processId: 3, loaded: true, lAddr: 12, mAddr: 6, dAddr: -1, loadedTime: 43, mark: false, processSize: 1, color: "#002500" },
+  { pageId: 13, processId: 4, loaded: false, lAddr: 13, mAddr: -1, dAddr: 6, loadedTime: 578, mark: false, processSize: 594, color: "#7C3238" },
+  { pageId: 14, processId: 4, loaded: true, lAddr: 14, mAddr: 7, dAddr: -1, loadedTime: 3, mark: false, processSize: 543, color: "#7C3238" },
+  { pageId: 15, processId: 4, loaded: false, lAddr: 15, mAddr: -1, dAddr: 7, loadedTime: 1, mark: false, processSize: 954, color: "#7C3238" },
+  */
+]
+pageTable = [/**/];
 // page = {
 //   pageId: 0,
 //   processId: 0,
@@ -53,18 +86,21 @@ algorithmInfo = {
 // }
 
 let img;
+const white = "#FFFFFF";
 
 function setup() {
+  runOpt();
   createCanvas(windowWidth, windowHeight);
-  for (let i = 0; i < 100; i++) {
-    optimalRAM.push({pageId: i, lAddr: i, color: getRandomColor()});
-    algorithmRAM.push({pageId: i, lAddr: i, color: getRandomColor()});
+  for (let i = 0; i < computer.framesQuantity; i++) {
+    optimalRAM.push({frameNumber: i, pageId:-1, occupied: 0, color: white});
+    algorithmRAM.push({frameNumber: i, pageId:-1, occupied: 0, color: white});
   }
-  pagesTableOptRAM = example;
-  pagesTableAlgRAM = example;
-  tableOpt = generateTable("RAM - OPT", pagesTableOptRAM,  windowWidth * 0.14, windowHeight * 0.23);
-  tableAlg = generateTable("RAM - ALG", pagesTableAlgRAM, windowWidth * 0.54, windowHeight * 0.23);
+  pagesTableOptRAM = optimalPages;
+  pagesTableAlgRAM = ramPages;
+  mmuOpt = generateTable("MMU - OPT", pagesTableOptRAM,  windowWidth * 0.15, 150);
+  mmuAlg = generateTable("MMU - ALG", pagesTableAlgRAM, windowWidth * 0.1 + 675, 150);
 }
+
 
 function preload() {
   img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
@@ -76,10 +112,10 @@ function draw() {
   image(img, 200, 600, 350, 250);
   showRAM("RAM - OPT", optimalRAM, 0);
   showRAM("RAM - ALG", algorithmRAM, 60);
-  tableOpt.html(generateHtmlTableInfo("RAM - OPT", pagesTableOptRAM));
-  tableAlg.html(generateHtmlTableInfo("RAM - ALG", pagesTableAlgRAM));
-  showInfoTable("RAM - OPT", optimalInfo, windowWidth * 0.14, windowHeight * 0.65);
-  showInfoTable("RAM - ALG", algorithmInfo, windowWidth * 0.54, windowHeight * 0.65);
+  mmuOpt.html(generateHtmlTableInfo("MMU - OPT", pagesTableOptRAM));
+  mmuAlg.html(generateHtmlTableInfo("MMU - ALG", pagesTableAlgRAM));
+  showInfoTable("MMU - OPT", optimalInfo, 300, 510);
+  showInfoTable("MMU - ALG", algorithmInfo, 900, 510);
 }
 
 function getRandomColor() {
@@ -97,27 +133,3 @@ function getRandomColor() {
   return color;
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  tableOpt.position(windowWidth * 0.14, windowHeight * 0.23);
-  tableAlg.position(windowWidth * 0.54, windowHeight * 0.23);
-}
-
-example = [
-  { pageId: 0, processId: 0, loaded: false, lAddr: 0, mAddr: -1, dAddr: 0, loadedTime: 0, mark: false, processSize: 500, color: "#16697A" },
-  { pageId: 1, processId: 0, loaded: true, lAddr: 1, mAddr: 0, dAddr: -1, loadedTime: 14, mark: false, processSize: 355, color: "#16697A" },
-  { pageId: 2, processId: 0, loaded: false, lAddr: 2, mAddr: -1, dAddr: 1, loadedTime: 5, mark: false, processSize: 653, color: "#16697A" },
-  { pageId: 3, processId: 1, loaded: true, lAddr: 3, mAddr: 1, dAddr: -1, loadedTime: 143, mark: false, processSize: 655, color: "#FFA62B" },
-  { pageId: 4, processId: 1, loaded: false, lAddr: 4, mAddr: -1, dAddr: 2, loadedTime: 6, mark: false, processSize: 123, color: "#FFA62B" },
-  { pageId: 5, processId: 1, loaded: true, lAddr: 5, mAddr: 2, dAddr: -1, loadedTime: 7, mark: false, processSize: 324, color: "#FFA62B" },
-  { pageId: 6, processId: 2, loaded: true, lAddr: 6, mAddr: 3, dAddr: -1, loadedTime: 9, mark: false, processSize: 512, color: "#B7245C" },
-  { pageId: 7, processId: 2, loaded: false, lAddr: 7, mAddr: -1, dAddr: 3, loadedTime: 23, mark: false, processSize: 1024, color: "#B7245C" },
-  { pageId: 8, processId: 2, loaded: true, lAddr: 8, mAddr: 4, dAddr: -1, loadedTime: 11, mark: false, processSize: 2048, color: "#B7245C" },
-  { pageId: 9, processId: 1, loaded: true, lAddr: 9, mAddr: 5, dAddr: -1, loadedTime: 54, mark: false, processSize: 783, color: "#FFA62B" },
-  { pageId: 10, processId: 3, loaded: false, lAddr: 10, mAddr: -1, dAddr: 4, loadedTime: 67, mark: false, processSize: 236, color: "#002500" },
-  { pageId: 11, processId: 3, loaded: false, lAddr: 11, mAddr: -1, dAddr: 5, loadedTime: 21, mark: false, processSize: 13, color: "#002500" },
-  { pageId: 12, processId: 3, loaded: true, lAddr: 12, mAddr: 6, dAddr: -1, loadedTime: 43, mark: false, processSize: 1, color: "#002500" },
-  { pageId: 13, processId: 4, loaded: false, lAddr: 13, mAddr: -1, dAddr: 6, loadedTime: 578, mark: false, processSize: 594, color: "#7C3238" },
-  { pageId: 14, processId: 4, loaded: true, lAddr: 14, mAddr: 7, dAddr: -1, loadedTime: 3, mark: false, processSize: 543, color: "#7C3238" },
-  { pageId: 15, processId: 4, loaded: false, lAddr: 15, mAddr: -1, dAddr: 7, loadedTime: 1, mark: false, processSize: 954, color: "#7C3238" },
-]
