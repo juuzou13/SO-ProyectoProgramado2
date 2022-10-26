@@ -1,66 +1,37 @@
-async function runOptimal(){
-    res = await readProcessesFromFile(result);
+function runOptimal(accessList){
+
+    res = loadProcesses(accessList);
   
     if(res){
-    
-      // Initialize page table
-      print("Procesos Algoritmo Optimo", processesOptimal);
-      print("Procesos Activos de Optimo", activeProcessesOptimal);
-      print("Lista de accesos Optimo", optimalAccessList);
+
+        print("Procesos Algoritmo Optimo", processesOptimal);
+        print("Procesos Activos de Optimo", activeProcessesOptimal);
+        print("Lista de accesos Optimo", optimalAccessList);
         
-      movePageToDisk(3);
-      
-      movePageToDisk(9)
+        /*
+        movePageToDisk(3);
+        movePageToDisk(9)
+        movePageToRam(9,18)
+        movePageToDisk(0)
+        movePageToDisk(8)
+        */
 
-      movePageToRam(9,20)
+        print(ramPagesOpt)
+        print(optimalDisk)
 
-      movePageToDisk(0)
-      movePageToDisk(8)
+        startExecution()
 
-      print(ramPagesOpt)
-      print(optimalDisk)
-  
     }else{
-      print("Error al leer el archivo");
+        print("Error al leer el archivo");
     }
-  }
-
-function pageInMemory(pageId){
-  memory = optimalRAM
-  for (let i = 0; i < memory.length; i++) {
-      if(memory[i].pageId == pageId){
-          return true;
-      }
-  }
-  return false
 }
-
-/*
-function processPageExists(pid) {
-  allPages = ramPagesOpt.concat(optimalDisk);
-
-  for (let i = 0; i < allPages.length; i++) {
-    if (allPages[i].processId == pid) {
-      return true;
-    }
-  }
-
-  return false;
-}
-*/
-
-ptrPage = []
 
 function pageExists(pageId) {
-  allPages = ramPagesOpt.concat(optimalDisk);
-  
-  for (let i = 0; i < allPages.length; i++) {
-    if (allPages[i].pageId == pageId) {
-      //print("page exists", pageId)
+  for (let i = 0; i < ramPagesOpt.length; i++) {
+    if (ramPagesOpt[i].pageId == pageId) {
       return true;
     }
   }
-
   return false;
 }
 
@@ -77,14 +48,8 @@ function getFirstFreeDiskSpace() {
 
 function movePageToDisk(pageID){
 
-  if(pageID == 6)
-    print("SSSSSSSSSSS", ramPagesOpt)
-
-
-
   mmuPageIndexInRam = ramPagesOpt.indexOf(ramPagesOpt.find(page => page.pageId == pageID));
 
-  print("mmuPageIndexInRam", mmuPageIndexInRam)
 
   if(ramPagesOpt[mmuPageIndexInRam].loaded == true){
     addrInRam = ramPagesOpt[mmuPageIndexInRam].mAddr;
@@ -109,7 +74,6 @@ function movePageToDisk(pageID){
 // ----------------------- Move to RAM -----------------------
 
 function getFreeFrame() {
-
   for (let i = 0; i < optimalRAM.length; i++) {
     if (optimalRAM[i].pageID == -1) {
       return i;
@@ -118,13 +82,14 @@ function getFreeFrame() {
   return -1;
 }
 
+
 function movePageToRam(pageID, frameID){
   
   mmuPageIndexInRam = ramPagesOpt.indexOf(ramPagesOpt.find(page => page.pageId == pageID));
 
-    addrInDisk = ramPagesOpt[mmuPageIndexInRam].dAddr;
-    indexFromPageInDisk = optimalDisk.indexOf(optimalDisk.find(page => page.dAddr == addrInDisk));
-    optimalDisk.splice(indexFromPageInDisk, 1);
+  addrInDisk = ramPagesOpt[mmuPageIndexInRam].dAddr;
+  indexFromPageInDisk = optimalDisk.indexOf(optimalDisk.find(page => page.dAddr == addrInDisk));
+  optimalDisk.splice(indexFromPageInDisk, 1);
 
   ramPagesOpt[mmuPageIndexInRam].loaded = true;
   ramPagesOpt[mmuPageIndexInRam].mAddr = frameID;
@@ -175,12 +140,14 @@ function assignAddress(pid, pointerID, size, color){
 
 
       movePageToDisk(availablePage);
-
+      
+      if(pid %2 == 0){
       freeFrame = getFreeFrame();
       
       if(freeFrame != -1){
         movePageToRam(availablePage, freeFrame);
       } 
+    }
 
 
     addresses.push({pointerID: pointerID, address: (availablePage * kbToB(computer.pageSize))});
@@ -217,7 +184,14 @@ function addProcessOptimal(pid, pointerID, size) {
       if(processesOptimal[i].pid == pid){
         processesOptimal[i].memoryTotal.push({pointerID: pointerID, size: size});
         processesOptimal[i].accessList.push(pointerID);
-        processesOptimal[i].memoryAssigned.push(assignAddress(pid, pointerID, size, processesOptimal[i].color));
+
+        addresses = assignAddress(pid, pointerID, size, processesOptimal[i].color);
+        
+        for(let j = 0; j < addresses.length; j++){
+            processesOptimal[i].memoryAssigned.push(addresses[j]);
+        }
+        
+        
       }
     }
   }
@@ -234,11 +208,10 @@ function removeProcessOptimal(pid) {
 
 // ------------------------ Optimal Algorithm End ------------------------ //
 
-async function readProcessesFromFile(data){
+function loadProcesses(data){
 
   //data = ['PID, Ptr, Size', '1,   001, 12200', '1,   002, 1024', '1,   003, 512', '2,   004, 256', '2,   005, 512', '3,   006, 128', '3,   007, 1024', '3,   008, 512', '3,   009, 512', '4,   010, 256']
   
-  let processes = [];
   let colHeaders = data[0].split(",");
 
   if(colHeaders.length != 3 || (colHeaders[0]!="PID" && colHeaders[1]!="Ptr" && colHeaders[2]!="Size")){
@@ -259,3 +232,105 @@ async function readProcessesFromFile(data){
 
   return 1;
 }
+
+function pageInMemory(pageId){
+    memory = optimalRAM
+    for (let i = 0; i < memory.length; i++) {
+        if(memory[i].pageID == pageId){
+            return true;
+        }
+    }
+    return false
+}
+
+function pageHitOptimal(selectedPage){
+    print("Page hit");
+}
+
+function pageFaultOptimal(selectedPage){
+    frameToInsert = getFreeFrame();
+    
+    if(frameToInsert != -1){
+        movePageToRam(selectedPage, frameToInsert);
+    }else{
+        
+        futurePointers = optimalAccessList.slice(1, optimalAccessList.length);
+        futurePages = futurePointers.map((pointer) => {getPointerPage(pointer)});
+
+        pagesInMemory = optimalRAM.map((page) => page.pageID);
+        
+        for(let i = 0; i < pagesInMemory.length; i++){
+
+            currPageID = pagesInMemory[i];
+            exists = counts.find((count) => count.pageID == currPageID);
+
+            if(exists != undefined){
+                count = futurePages.filter((pageID) => pageID == currPageID).length;
+                currCount = {pageID: currPageID, count: count};
+            }
+
+        }
+        leastUsedPage = counts.reduce((prev, curr) => prev.count < curr.count ? prev : curr);
+        frame = optimalRAM.find((page) => page.pageID == leastUsedPage.pageID).frameID;
+        
+        movePageToDisk(leastUsedPage.pageID);
+        movePageToRam(selectedPage, frame);
+    }
+}
+
+function getPointerPage(selectedPointer){
+    processWithTheAccess = processesOptimal.find(process => process.accessList.includes(selectedPointer));
+    pageAssociatedWithThePointer = processWithTheAccess.memoryAssigned.find(page => page.pointerID == selectedPointer);
+    pageNumber = Math.floor(pageAssociatedWithThePointer.address / kbToB(computer.pageSize));
+    return pageNumber
+}
+
+async function startExecution(){
+
+    while(optimalAccessList.length > 0){
+
+        selectedProcess = optimalAccessList[0];
+
+        await new Promise(r => setTimeout(r, 1000));
+        
+        pageNumber = getPointerPage(selectedProcess);
+
+        
+
+        if(pageInMemory(pageNumber)){
+            pageHitOptimal(pageNumber);
+        }else{
+            pageFaultOptimal(pageNumber);
+        }
+
+
+        optimalAccessList.shift();
+
+    }
+}
+
+/*
+function processPageExists(pid) {
+  allPages = ramPagesOpt.concat(optimalDisk);
+
+  for (let i = 0; i < allPages.length; i++) {
+    if (allPages[i].processId == pid) {
+      return true;
+    }
+  }
+
+  return false;
+}
+*/
+
+/*
+function pageInMemory(pageId){
+  memory = optimalRAM
+  for (let i = 0; i < memory.length; i++) {
+      if(memory[i].pageId == pageId){
+          return true;
+      }
+  }
+  return false
+}
+*/

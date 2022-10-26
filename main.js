@@ -1,5 +1,4 @@
 //Computer Specifications
-
 computer = {
   cores: 1,
   instructionsPSec: 1,
@@ -10,14 +9,16 @@ computer = {
   framesQuantity: 400 / 4,
 }
 
-mmuOpt = [];
+
+// ----------------------- User Algorithm -----------------------
+
+//MMU Graphics
 mmuAlg = [];
 
 pagesTableAlgRAM = [];
 diskPagesAlgRAM = [];
 
 algorithmRAM = [];
-algorithmRAMFramesLeft = computer.framesQuantity;
 
 algorithmInfo = {
   process: 7,
@@ -32,7 +33,12 @@ algorithmInfo = {
 
 ramPages=[];
 
+// ----------------------- End of User Algorithm ----------------------- //
+
 // ------------------------ Optimal Algorithm ------------------------ //
+
+//MMU Graphics
+mmuOpt = [];
 
 // Optimal Algorithm RAM 
 optimalRAM = [];
@@ -42,8 +48,6 @@ optimalRAMFramesLeft = computer.framesQuantity;
 // Optimal Algorithm Pages
 ramPagesOpt = [];
 optimalDisk = [];
-
-pagesTableOptRAM = [];
 
 // Optimal Algorithm Page Table
 optimalPageTable = []
@@ -112,9 +116,12 @@ optimalAccessList = [];
 let img;
 const white = "#FFFFFF";
 
-processes = [];
-activeProcesses = [];
+let fileContents;
 
+function preload() {
+  img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
+  fileContents = loadStrings("procesos.txt");
+}
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -122,20 +129,12 @@ async function setup() {
     optimalRAM.push({frameNumber: i, pageID:-1, color: white});
     algorithmRAM.push({frameNumber: i, pageID:-1, color: white});
   }
-  pagesTableOptRAM = ramPagesOpt;
   pagesTableAlgRAM = ramPages;
-  mmuOpt = generateTable("MMU - OPT", pagesTableOptRAM,  windowWidth * 0.15, 150);
+  mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", pagesTableAlgRAM, windowWidth * 0.1 + 675, 150);
   
-  runOptimal();
+  runOptimal(fileContents);
 
-}
-
-let result;
-
-function preload() {
-  img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
-  result = loadStrings("procesos.txt");
 }
 
 function draw() {
@@ -144,7 +143,7 @@ function draw() {
   image(img, 200, 600, 350, 250);
   showRAM("RAM - OPT", optimalRAM, 0);
   showRAM("RAM - ALG", algorithmRAM, 60);
-  mmuOpt.html(generateHtmlTableInfo("MMU - OPT", pagesTableOptRAM));
+  mmuOpt.html(generateHtmlTableInfo("MMU - OPT", ramPagesOpt));
   mmuAlg.html(generateHtmlTableInfo("MMU - ALG", pagesTableAlgRAM));
   showInfoTable("MMU - OPT", optimalInfo, 300, 510);
   showInfoTable("MMU - ALG", algorithmInfo, 900, 510);
@@ -161,7 +160,5 @@ function getRandomColor() {
       break;
     }
   }
-
   return color;
 }
-
