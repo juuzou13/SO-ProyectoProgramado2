@@ -9,17 +9,22 @@ computer = {
   framesQuantity: 400 / 4,
 }
 
+// General Variables
+
 
 // ----------------------- User Algorithm -----------------------
 
 //MMU Graphics
 mmuAlg = [];
 
-pagesTableAlgRAM = [];
-diskPagesAlgRAM = [];
+// Algorithm Pages
+ramPagesAlg = [];
+algDisk = [];
 
+// Graphic RAM
 algorithmRAM = [];
 
+// Algorithm Information
 algorithmInfo = {
   process: 7,
   simulationTime: 400,
@@ -31,7 +36,12 @@ algorithmInfo = {
   Fragmentation: 172,
 }
 
-ramPages=[];
+// Algorithm List of Marked Pages
+algMarkPages = [];
+algAuxMarkPages = [];
+
+// Algorithm Interval Time
+intervalTimeAlg = 0;
 
 // ----------------------- End of User Algorithm ----------------------- //
 
@@ -129,9 +139,8 @@ async function setup() {
     optimalRAM.push({frameNumber: i, pageID:-1, color: white});
     algorithmRAM.push({frameNumber: i, pageID:-1, color: white});
   }
-  pagesTableAlgRAM = ramPages;
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
-  mmuAlg = generateTable("MMU - ALG", pagesTableAlgRAM, windowWidth * 0.1 + 675, 150);
+  mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
   runOptimal(fileContents);
 
@@ -144,7 +153,7 @@ function draw() {
   showRAM("RAM - OPT", optimalRAM, 0);
   showRAM("RAM - ALG", algorithmRAM, 60);
   mmuOpt.html(generateHtmlTableInfo("MMU - OPT", ramPagesOpt));
-  mmuAlg.html(generateHtmlTableInfo("MMU - ALG", pagesTableAlgRAM));
+  mmuAlg.html(generateHtmlTableInfo("MMU - ALG", ramPagesAlg));
   showInfoTable("MMU - OPT", optimalInfo, 300, 510);
   showInfoTable("MMU - ALG", algorithmInfo, 900, 510);
 }
