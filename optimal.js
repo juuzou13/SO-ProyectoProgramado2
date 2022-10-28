@@ -16,8 +16,8 @@ function runOptimal(accessList){
         movePageToDisk(8)
         */
 
-        print(ramPagesOpt)
-        print(optimalDisk)
+        //print(ramPagesOpt)
+        //print(optimalDisk)
 
         startExecution()
 
@@ -247,42 +247,71 @@ function pageHitOptimal(selectedPage){
     print("Page hit");
 }
 
-function pageFaultOptimal(selectedPage){
+async function pageFaultOptimal(selectedPage){
     frameToInsert = getFreeFrame();
+    
     
     if(frameToInsert != -1){
         movePageToRam(selectedPage, frameToInsert);
     }else{
-        
-        futurePointers = optimalAccessList.slice(1, optimalAccessList.length);
-        futurePages = futurePointers.map((pointer) => {getPointerPage(pointer)});
 
-        pagesInMemory = optimalRAM.map((page) => page.pageID);
+        futurePointers = optimalAccessList.slice(1, optimalAccessList.length);
+        //print("Future pointers: " + futurePointers);
+
+        pagesToCheck = [];
+        for(let i = 0; i < futurePointers.length; i++){
+            pN = await getPointerPages(futurePointers[i]);
+            k = pN.slice()
+
+            pagesToCheck = pagesToCheck.concat(k);
+        }
+        print("Page string: " + pagesToCheck);
+        //await new Promise(r => setTimeout(r, 2000));
+        /*
+        print(pageString)
         
+        /*
+        pagesInMemory = optimalRAM.map((page) => page.pageID);
+
+        counts = [];
+
         for(let i = 0; i < pagesInMemory.length; i++){
 
             currPageID = pagesInMemory[i];
-            exists = counts.find((count) => count.pageID == currPageID);
 
-            if(exists != undefined){
-                count = futurePages.filter((pageID) => pageID == currPageID).length;
-                currCount = {pageID: currPageID, count: count};
+            pageAlreadyCounted = counts.find((count) => count.pageID == currPageID);
+
+            if(!pageAlreadyCounted){
+                currPageCount = pageString.filter((pageID) => pageID == currPageID).length;
+                currCount = {pageID: currPageID, count: currPageCount};
+                counts.push(currCount);
             }
 
         }
         leastUsedPage = counts.reduce((prev, curr) => prev.count < curr.count ? prev : curr);
-        frame = optimalRAM.find((page) => page.pageID == leastUsedPage.pageID).frameID;
+        frame = optimalRAM.find((page) => page.pageID == leastUsedPage.pageID).frameNumber;
+
+        print("Page fault");
+        print("Page to replace: " + leastUsedPage.pageID);
+        print("Page to insert: " + selectedPage);
+        print("Frame to replace it in: " + frame);
         
         movePageToDisk(leastUsedPage.pageID);
         movePageToRam(selectedPage, frame);
+        */
     }
+
+    return 1;
 }
 
-function getPointerPage(selectedPointer){
-    processWithTheAccess = processesOptimal.find(process => process.accessList.includes(selectedPointer));
-    pageAssociatedWithThePointer = processWithTheAccess.memoryAssigned.find(page => page.pointerID == selectedPointer);
-    pageNumber = Math.floor(pageAssociatedWithThePointer.address / kbToB(computer.pageSize));
-    return pageNumber
+function getPointerPages(selectedPointer){
+
+    pageN = [];
+
+    pagesWithPointer = ramPagesOpt.filter((page) => page.lAddr == selectedPointer);
+    pageN = pagesWithPointer.map((page) => {return page.pageId});
+    
+    return pageN.slice()
 }
 
 async function startExecution(){
@@ -291,17 +320,27 @@ async function startExecution(){
 
         selectedProcess = optimalAccessList[0];
 
-        await new Promise(r => setTimeout(r, 1000));
-        
-        pageNumber = getPointerPage(selectedProcess);
+        pN = await getPointerPages(selectedProcess);
 
-        
+        pageNumbers = pN.slice()
 
-        if(pageInMemory(pageNumber)){
+        for(let i = 0; i < pageNumbers.length; i++){
+          
+          //await new Promise(r => setTimeout(r, 1));
+          pageNumber = pageNumbers[i];
+          print(i, optimalAccessList)
+          if(pageInMemory(pageNumber)){
             pageHitOptimal(pageNumber);
-        }else{
-            pageFaultOptimal(pageNumber);
+          }else{
+            await pageFaultOptimal(pageNumber);
+          }
+
+          //print("Page numbers: " + pageNumbers);
+
         }
+        //print("Page numbers 1: " + pageNumbers);
+        print("Salio")
+        await new Promise(r => setTimeout(r, 2000));
 
 
         optimalAccessList.shift();
