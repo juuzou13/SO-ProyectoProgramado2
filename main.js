@@ -10,6 +10,8 @@ computer = {
 }
 
 // General Variables
+generalProcesses = [];
+pointerAccessList = [];
 
 
 // ----------------------- User Algorithm -----------------------
@@ -75,11 +77,8 @@ optimalInfo = {
 }
 
 // Optimal Algorithm Processes
-processesOptimal = [];
-activeProcessesOptimal = [];
 
-// Access List
-optimalAccessList = [];
+activeProcessesOptimal = [];
 
 // --------------------------------------------------------------------- //
 
@@ -134,6 +133,20 @@ function preload() {
 }
 
 async function setup() {
+
+  var seed;
+
+  // seed = prompt("Ingrese un número entero positivo para la seed (default: 1)", "");
+  // seed = parseInt(seed, 10);
+  // if (!(seed != null && Number.isInteger(seed) && seed >= 0)) {
+  //   seed = 1;
+  // }
+
+  seed = random(1000000);
+
+  // acá se establece la seed para los numeros aleatorios
+  randomSeed(seed);
+
   createCanvas(windowWidth, windowHeight);
   for (let i = 0; i < computer.framesQuantity; i++) {
     optimalRAM.push({frameNumber: i, pageID:-1, color: white});

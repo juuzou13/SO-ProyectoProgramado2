@@ -66,7 +66,7 @@ function generateHtmlTableInfo(title, table) {
         } else {
             html += "<td></td>";
         }
-        html += "<td>"+table[i].loadedTime+"</td>";
+        html += "<td>"+table[i].loadedTime+"s"+"</td>";
         if (table[i].mark) {
             html += "<td>X</td>";
         } else {

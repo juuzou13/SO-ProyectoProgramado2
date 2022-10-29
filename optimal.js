@@ -1,12 +1,12 @@
-function runOptimal(accessList){
+async function runOptimal(fileContents){
 
-    res = loadProcesses(accessList);
+    res = await loadProcesses(fileContents);
   
     if(res){
 
-        print("Procesos Algoritmo Optimo", processesOptimal);
+        print("Procesos Algoritmo Optimo", generalProcesses);
         print("Procesos Activos de Optimo", activeProcessesOptimal);
-        print("Lista de accesos Optimo", optimalAccessList);
+        print("Lista de accesos Optimo", pointerAccessList);
         
         /*
         movePageToDisk(3);
@@ -103,60 +103,91 @@ function movePageToRam(pageID, frameID){
 
 // ----------------------- End of move to RAM -----------------------
   
+// function assignAddress(pid, pointerID, size, color){
+async function assignAddress(){
 
-function assignAddress(pid, pointerID, size, color){
+  blackList = [];
 
-  pagesAmount = Math.ceil(bToKb(size) / 4);
-  allPages = ramPagesOpt.concat(optimalDisk);
+  for (let i = 0; i < pointerAccessList.length; i++) {
 
-  addresses = [];
+    if(!blackList.includes(pointerAccessList[i])){
+      process = generalProcesses.find(process => process.pointerOrder.includes(pointerAccessList[i]));
+      index = generalProcesses.indexOf(process);
+      if(index != -1){
 
-  for(let i = 0; i < pagesAmount; i++){
+        pid = generalProcesses[index].pid;
+        pointerID = pointerAccessList[i];
+        size = generalProcesses[index].memoryTotal.find(pointer => pointer.pointerID == pointerID).size;
+        colorId = generalProcesses[index].color;
+        blackList.push(pointerID);
+        
+        pagesAmount = Math.ceil(bToKb(size) / 4);
+        allPages = ramPagesOpt.concat(optimalDisk);
 
-    allPages = ramPagesOpt.concat(optimalDisk);
+        addresses = [];
 
-    availablePage = 0;
-    for(let i = 0; i < allPages.length+1; i++){
-      if(!pageExists(i)){
-        availablePage = i;
-        break;
+        for(let i = 0; i < pagesAmount; i++){
+
+          allPages = ramPagesOpt.concat(optimalDisk);
+
+          availablePage = 0;
+          for(let i = 0; i < allPages.length+1; i++){
+            if(!pageExists(i)){
+              availablePage = i;
+              break;
+            }
+          }
+          
+          //ptrPage.push({pointerID: pointerID, pageId: availablePage});
+
+          newSize = size > kbToB(computer.pageSize)? kbToB(computer.pageSize) : size;
+
+          ramPagesOpt.push({ pageId: availablePage, 
+            processId: pid, 
+            loaded: false, 
+            lAddr: pointerID , 
+            mAddr: -1, 
+            dAddr: 0, 
+            loadedTime: 0, 
+            mark: false, 
+            processSize: newSize, 
+            color: colorId 
+          });
+
+          ramPagesAlg.push({ pageId: availablePage, 
+            processId: pid, 
+            loaded: false, 
+            lAddr: pointerID , 
+            mAddr: -1, 
+            dAddr: 0, 
+            loadedTime: 0, 
+            mark: false, 
+            processSize: newSize, 
+            color: colorId 
+          });
+
+          movePageToDisk(availablePage);
+          
+          if(0){
+            freeFrame = getFreeFrame();
+            
+            if(freeFrame != -1){
+              movePageToRam(availablePage, freeFrame);
+            } 
+          }
+
+          addresses.push({pointerID: pointerID, address: (availablePage * kbToB(computer.pageSize))});
+
+          size -= kbToB(computer.pageSize);
+        }
+
+        generalProcesses[index].memoryAssigned.push(addresses);
+
+      } else {
+        print("Error en el proceso")
       }
     }
-    
-    //ptrPage.push({pointerID: pointerID, pageId: availablePage});
-
-    newSize = size > kbToB(computer.pageSize)? kbToB(computer.pageSize) : size;
-
-    ramPagesOpt.push({ pageId: availablePage, 
-      processId: pid, 
-      loaded: false, 
-      lAddr: pointerID , 
-      mAddr: -1, 
-      dAddr: 0, 
-      loadedTime: 0, 
-      mark: false, 
-      processSize: newSize, 
-      color: color })
-
-
-      movePageToDisk(availablePage);
-      
-      if(pid %2 == 0){
-      freeFrame = getFreeFrame();
-      
-      if(freeFrame != -1){
-        movePageToRam(availablePage, freeFrame);
-      } 
-    }
-
-
-    addresses.push({pointerID: pointerID, address: (availablePage * kbToB(computer.pageSize))});
-
-    size -= kbToB(computer.pageSize);
   }
-
-  return addresses;
-
 }
 
   //ramPagesOpt.push({ pageId: 0, processId: 0, loaded: false, lAddr: 0, mAddr: -1, dAddr: 0, loadedTime: 0, mark: false, processSize: 500, color: "#16697A" })
@@ -169,38 +200,27 @@ function addProcessOptimal(pid, pointerID, size) {
     activeProcessesOptimal.push(pid);
 
     colorToAssign = getRandomColor();
-    addresses = assignAddress(pid, pointerID, size, colorToAssign);
 
-    processesOptimal.push({pid: pid,
+    generalProcesses.push({pid: pid,
       memoryTotal: [{pointerID: pointerID, size: size}],
-      memoryAssigned: addresses,
-      accessList: [pointerID],
+      memoryAssigned: [], //assignAddress(pid, pointerID, size, colorToAssign),
+      pointerOrder: [pointerID],
       color: colorToAssign,
     });
-    
-    
   }else{
-    for(let i = 0; i < processesOptimal.length; i++){
-      if(processesOptimal[i].pid == pid){
-        processesOptimal[i].memoryTotal.push({pointerID: pointerID, size: size});
-        processesOptimal[i].accessList.push(pointerID);
-
-        addresses = assignAddress(pid, pointerID, size, processesOptimal[i].color);
-        
-        for(let j = 0; j < addresses.length; j++){
-            processesOptimal[i].memoryAssigned.push(addresses[j]);
-        }
-        
-        
+    for(let i = 0; i < generalProcesses.length; i++){
+      if(generalProcesses[i].pid == pid){
+        generalProcesses[i].memoryTotal.push({pointerID: pointerID, size: size});
+        generalProcesses[i].pointerOrder.push(pointerID);
       }
     }
   }
 }
 
 function removeProcessOptimal(pid) {
-  for(let i = 0; i < processesOptimal.length; i++){
-    if(processesOptimal[i].pid == pid){
-      processesOptimal.splice(i, 1);
+  for(let i = 0; i < generalProcesses.length; i++){
+    if(generalProcesses[i].pid == pid){
+      generalProcesses.splice(i, 1);
       activeProcessesOptimal.splice(activeProcessesOptimal.indexOf(pid), 1);
     }    
   }
@@ -208,7 +228,33 @@ function removeProcessOptimal(pid) {
 
 // ------------------------ Optimal Algorithm End ------------------------ //
 
-function loadProcesses(data){
+async function randomizepointerAccessList(){
+  // CopypointerAccessList = pointerAccessList.slice();
+  pointerOrderList = [];
+
+  for(let i = 0; i < generalProcesses.length; i++){
+    maxDuplicate = round(random(0, 10));
+    pointerOrderLength = generalProcesses[i].pointerOrder.length;
+    for(let j = 0; j < maxDuplicate; j++){
+      randomIndex = round(random(0, pointerOrderLength-1));
+      generalProcesses[i].pointerOrder.push(generalProcesses[i].pointerOrder[randomIndex]);
+    }
+    pointerOrderList.push(generalProcesses[i].pointerOrder.slice());
+  }
+
+  while (pointerOrderList.length > 0) {
+    randomIndex = round(random(0, pointerOrderList.length-1));
+    pointerAccessList.push(pointerOrderList[randomIndex].shift());
+    if(pointerOrderList[randomIndex].length == 0){
+      pointerOrderList.splice(randomIndex, 1);
+    }
+  }
+
+  print("pointerAccessList",pointerAccessList);
+
+}
+
+async function loadProcesses(data){
 
   //data = ['PID, Ptr, Size', '1,   001, 12200', '1,   002, 1024', '1,   003, 512', '2,   004, 256', '2,   005, 512', '3,   006, 128', '3,   007, 1024', '3,   008, 512', '3,   009, 512', '4,   010, 256']
   
@@ -222,7 +268,6 @@ function loadProcesses(data){
     try{
       processInfo = data[i].split(",");
       processInfo = processInfo.map((info) => parseInt(info.trim()));
-      optimalAccessList.push(processInfo[1]);
     }catch{
       print("Error: Datos incorrectos en columna " + i);
       return 0;
@@ -230,6 +275,9 @@ function loadProcesses(data){
     addProcessOptimal(processInfo[0], processInfo[1], processInfo[2]);
   }
 
+  await randomizepointerAccessList();
+  await assignAddress();
+  
   return 1;
 }
 
@@ -255,7 +303,7 @@ async function pageFaultOptimal(selectedPage){
         movePageToRam(selectedPage, frameToInsert);
     }else{
 
-        futurePointers = optimalAccessList.slice(1, optimalAccessList.length);
+        futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
         //print("Future pointers: " + futurePointers);
 
         pagesToCheck = [];
@@ -314,38 +362,50 @@ function getPointerPages(selectedPointer){
     return pageN.slice()
 }
 
-async function startExecution(){
+async function startExecution(algorithm){
 
-    while(optimalAccessList.length > 0){
+    while(pointerAccessList.length > 0){
 
-        selectedProcess = optimalAccessList[0];
+        selectedProcess = pointerAccessList[0];
 
         pN = await getPointerPages(selectedProcess);
-
         pageNumbers = pN.slice()
 
         for(let i = 0; i < pageNumbers.length; i++){
           
           //await new Promise(r => setTimeout(r, 1));
           pageNumber = pageNumbers[i];
-          print(i, optimalAccessList)
-          if(pageInMemory(pageNumber)){
-            pageHitOptimal(pageNumber);
-          }else{
-            await pageFaultOptimal(pageNumber);
+          print(i, pointerAccessList)
+          
+          if (algorithm=="LRU"){
+            // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
+          } else if (algorithm=="Second Chance"){
+            // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
+          } else if (algorithm=="Aging"){
+            // await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
+          } else if (algorithm=="Random"){
+            // await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
+          } else {
+            await optimalProcess(pageNumber);
           }
-
-          //print("Page numbers: " + pageNumbers);
-
         }
         //print("Page numbers 1: " + pageNumbers);
         print("Salio")
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 1000));
 
+        
 
-        optimalAccessList.shift();
+        pointerAccessList.shift();
 
     }
+}
+
+async function optimalProcess(pageNumber){
+  if(pageInMemory(pageNumber)){
+    pageHitOptimal(pageNumber);
+  }else{
+    await pageFaultOptimal(pageNumber);
+  }
 }
 
 /*
