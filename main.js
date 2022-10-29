@@ -190,9 +190,11 @@ function processFile(file) {
 
 async function runMainProgram() {
   if(fileContents == undefined) {
-    prompt("Seleccione un archivo de texto");
+    window.alert("Seleccione un archivo de texto");
   } else if(seed.value() == "") {
-    prompt("Ingrese una semilla");
+    window.alert("Ingrese una semilla");
+  } else if(isNaN(seed.value())) {
+    window.alert("Ingrese una semilla válida (número)")
   } else {
     randomSeed(seed.value());
     await mainProgram(fileContents, algorithm.value());
@@ -256,6 +258,8 @@ async function mainProgram(fileContents, algorithm){
 
   if(res){
 
+      button.hide();
+
       print("Procesos Algoritmo Optimo", generalProcesses);
       print("Procesos Activos de Optimo", activeProcesses);
       print("Lista de accesos Optimo", pointerAccessList);
@@ -263,7 +267,7 @@ async function mainProgram(fileContents, algorithm){
       await startExecution(algorithm)
 
   }else{
-      print("Error al leer el archivo");
+      window.alert("Error al leer el archivo");
   }
 }
 
