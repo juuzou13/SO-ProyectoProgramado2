@@ -46,80 +46,80 @@ function getPagesFromPointerList(pointerList){
   return pages;
 }
 
-async function pageFaultOptimal(selectedPage, exclusionList){
+async function pageFaultOptimal(selectedPage){
     print("Page fault Optimal");
     frameToInsert = getFreeFrame(optimalRAM);
     
-    
-    if(frameToInsert != -1){
-        movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);
-    }else{
+    try {
+      if(frameToInsert != -1){
+          movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);
+      }else{
 
 
-        let futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
-        let k = getPagesFromPointerList(futurePointers);
-        let referenceString = k;
+          let futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
+          let k = getPagesFromPointerList(futurePointers);
+          let referenceString = k;
 
-        let pagesInRam = optimalRAM.map((page) => page.pageID);
-        let PR = pagesInRam.slice();
+          let pagesInRam = optimalRAM.map((page) => page.pageID);
+          let PR = pagesInRam.slice();
 
-        let amountOfPagesInRam = PR.length;
+          let amountOfPagesInRam = PR.length;
 
-        let pageToLookIntoFuture;
+          let pageToLookIntoFuture;
 
-        let latterPage = 0;
-        let cyclesUntilCalled = 0;
+          let latterPage = 0;
+          let cyclesUntilCalled = 0;
 
-        let haveFoundNonRefPage = 0;
+          let haveFoundNonRefPage = 0;
 
-        let mostCyclesUntilCalled = 0;
+          let mostCyclesUntilCalled = 0;
 
-        let pagesNeverReferencedAgain = [];
+          let pagesNeverReferencedAgain = [];
 
-        for (let i = 0; i < amountOfPagesInRam; i++) {
+          for (let i = 0; i < amountOfPagesInRam; i++) {
 
 
-          pageToLookIntoFuture = PR[i];
-          cyclesUntilCalled = -1;
+            pageToLookIntoFuture = PR[i];
+            cyclesUntilCalled = -1;
 
-          for (let j = 0; j < referenceString.length; j++) {
-            if (pageToLookIntoFuture == referenceString[j]) {
-              cyclesUntilCalled = j;
-              break;
+            for (let j = 0; j < referenceString.length; j++) {
+              if (pageToLookIntoFuture == referenceString[j]) {
+                cyclesUntilCalled = j;
+                break;
+              }
             }
+
+            if (cyclesUntilCalled == -1) {
+              haveFoundNonRefPage = 1
+              pagesNeverReferencedAgain.push(pageToLookIntoFuture)
+            }
+
+            if (!haveFoundNonRefPage) {
+              if (cyclesUntilCalled > mostCyclesUntilCalled) {
+                mostCyclesUntilCalled = cyclesUntilCalled;
+                latterPage = pageToLookIntoFuture;
+              }
+            } else {
+              let pagesLength = pagesNeverReferencedAgain.length;
+
+              if (pagesLength == 1) {
+                latterPage = pagesNeverReferencedAgain[0];
+              }else{
+                d = getLongestTimeInRamFromList(pagesNeverReferencedAgain.slice(), ramPagesOpt)
+                latterPage = d;
+              }
+            }
+
           }
 
-          if (cyclesUntilCalled == -1) {
-            haveFoundNonRefPage = 1
-            pagesNeverReferencedAgain.push(pageToLookIntoFuture)
-          }
+          frameToInsert = getFrameFromPage(latterPage, optimalRAM);
 
-          if (!haveFoundNonRefPage) {
-            if (cyclesUntilCalled > mostCyclesUntilCalled) {
-              mostCyclesUntilCalled = cyclesUntilCalled;
-              latterPage = pageToLookIntoFuture;
-            }
-          } else {
-            let pagesLength = pagesNeverReferencedAgain.length;
+          movePageToDisk(latterPage, ramPagesOpt, optimalDisk, optimalRAM);
+          movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);
 
-            if (pagesLength == 1) {
-              latterPage = pagesNeverReferencedAgain[0];
-            }else{
-              d = getLongestTimeInRamFromList(pagesNeverReferencedAgain.slice(), ramPagesOpt)
-              latterPage = d;
-            }
-          }
-
-        }
-
-        frameToInsert = getFrameFromPage(latterPage, optimalRAM);
-
-        movePageToDisk(latterPage, ramPagesOpt, optimalDisk, optimalRAM);
-        movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);
-
-        
-
-        
+      }
+    } catch (error) {
+      return -1;
     }
 
     return 1;
@@ -131,7 +131,9 @@ async function optimalProcess(pageNumber){
   if(pageInMemory(pageNumber, optimalRAM)){
     pageHitOptimal(pageNumber);
   }else{
-    await pageFaultOptimal(pageNumber);
+    if (await pageFaultOptimal(pageNumber) == -1) {
+      await pageFaultOptimal(pageNumber);
+    }
   }
 }
 

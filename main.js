@@ -18,7 +18,7 @@ pointerAccessList = [];
 let optimalTime = 0;
 let algorithmTime = 0;
 
-let duplicatePointersNumber = 50;
+let duplicatePointersNumber = 20;
 
 // ----------------------- User Algorithm -----------------------
 
@@ -214,15 +214,15 @@ async function runMainProgram() {
   }
 }
 
-
 async function startExecution(algorithm){
 
   if (algorithm == "Aging"){
     markAgingLoop();
   }
+  updateLoop();
 
   while(pointerAccessList.length > 0){
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 100));
       optimalTime = 0;
       algorithmTime = 0;
       
@@ -258,7 +258,16 @@ async function startExecution(algorithm){
       optimalInfo.simulationTime += optimalTime;
       algorithmInfo.simulationTime += algorithmTime;
 
-      updateTables();
+      processId = getPidOfPointer(selectedProcess);
+      
+      shiftPointerOrder(processId);
+
+      if (!processHasPointersLeft(processId)){
+        print("Process", processId, "has no more pointers left");
+        removeProcess(processId);
+      }
+
+      
 
       pointerAccessList.shift();
 
@@ -303,6 +312,13 @@ function sumTimeToPagesInRam(ram, time){
     if (ram[i].loaded != false) {
       ram[i].loadedTime += time;
     }
+  }
+}
+
+async function updateLoop() {
+  while (ramPagesOpt.length > 0) {
+    await new Promise(r => setTimeout(r, 1000));
+    updateTables();
   }
 }
 

@@ -164,12 +164,14 @@ function showInfoTable(title, info, widthPos, heightPos) {
     textAlign(CENTER);
     text(info.RAMused, widthPos + width/8, heightPos + 10);
 
+    ramPercent = (info.RAMused / computer.ramSize * 100).toFixed(1);
+
     fill(255);
     rect(widthPos + width/4, heightPos, width/4, 30);
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.RAMused / computer.ramSize * 100}%`, widthPos + width/4 + width/8, heightPos + 10);
+    text(`${ramPercent}%`, widthPos + width/4 + width/8, heightPos + 10);
 
     fill(255);
     rect(widthPos + width/2, heightPos, width/4, 30);

@@ -2,7 +2,10 @@ async function agingProcess(pageNumber) {
     if (pageInMemory(pageNumber, algorithmRAM)) {
         pageHitAging(pageNumber);
     } else {
-        pageFaultAging(pageNumber);
+        if (await pageFaultAging(pageNumber) == -1) {
+            await new Promise(r => setTimeout(r, 10000));
+            await pageFaultAging(pageNumber);
+        }
     }
 }
 
@@ -13,30 +16,40 @@ function pageHitAging(pageNumber) {
     }
 }
 
-function pageFaultAging(selectedPage) {
+async function pageFaultAging(selectedPage) {
     print("Page fault Aging");
-    
-    frameToInsert = getFreeFrame(algorithmRAM);
+    try {
+        frameToInsert = getFreeFrame(algorithmRAM);
 
-    if(frameToInsert != -1){
-        movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
-        algMarkPages.push({pageId: selectedPage, binary: "000000"});
-    }else{
-        frameToInsert = movePageToDisk(algMarkPages[0].pageId, ramPagesAlg, algDisk, algorithmRAM);
+        if(frameToInsert != -1){
+            movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
+            algMarkPages.push({pageId: selectedPage, binary: "000000"});
+        }else{
+            frameToInsert = movePageToDisk(algMarkPages[0].pageId, ramPagesAlg, algDisk, algorithmRAM);
 
-        movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
-        algMarkPages.shift();
-        algMarkPages.push({pageId: selectedPage, binary: "000000"});
-        
-        index = ramPagesAlg.map(object => object.pageId).indexOf(algMarkPages[0].pageId);
+            if(frameToInsert == -1){
+                pageFaultAging(selectedPage);
+            } else {
+                movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
+                algMarkPages.shift();
+                algMarkPages.push({pageId: selectedPage, binary: "000000"});
+                
+                index = ramPagesAlg.map(object => object.pageId).indexOf(algMarkPages[0].pageId);
 
-        if (index != -1) {
-            ramPagesAlg[index].mark = true;
-            algMarkIndex = index;
-        } else {
-            print("Error Aging4");
+                if (index != -1) {
+                    ramPagesAlg[index].mark = true;
+                    algMarkIndex = index;
+                } else {
+                    print("Error Aging4");
+                }
+            }
         }
+    } catch (error) {
+        return -1;
     }
+
+    return 1;
+    
 }
 
 async function markAgingLoop() {
