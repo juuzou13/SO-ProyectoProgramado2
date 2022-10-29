@@ -19,25 +19,28 @@ function pageExists(pageId, ram) {
   }
   
   
-  function movePageToDisk(pageID, ram, disk){
+  function movePageToDisk(pageID, ram, disk, graphicRam){
   
     mmuPageIndexInRam = ram.indexOf(ram.find(page => page.pageId == pageID));
-  
+    addrInRam = 0;
   
     if(ram[mmuPageIndexInRam].loaded == true){
       addrInRam = ram[mmuPageIndexInRam].mAddr;
-      optimalRAM[addrInRam].pageId = -1;
-      optimalRAM[addrInRam].color = white;
+      graphicRam[addrInRam].pageId = -1;
+      graphicRam[addrInRam].color = white;
     }
   
     ram[mmuPageIndexInRam].loaded = false;
     ram[mmuPageIndexInRam].mAddr = -1;
+    ram[mmuPageIndexInRam].mark = false;
   
     freeDiskSpace = getFirstFreeDiskSpace(disk);
   
     ram[mmuPageIndexInRam].dAddr = freeDiskSpace
     disk.push({dAddr: freeDiskSpace, pageId: pageID});
     ram[mmuPageIndexInRam].loadedTime = 0;
+
+    return addrInRam;
   
   }
   
@@ -72,8 +75,6 @@ function pageExists(pageId, ram) {
     graphicRam[frameID].pageID = pageID;
     graphicRam[frameID].color = ram[mmuPageIndexInRam].color;
 
-
-  
   }
   
   // ----------------------- End of move to RAM -----------------------
@@ -142,6 +143,7 @@ function pageExists(pageId, ram) {
             });
   
             movePageToDisk(availablePage, ramPagesOpt, optimalDisk);
+            movePageToDisk(availablePage, ramPagesAlg, algDisk);
             
             if(0){
               freeFrame = getFreeFrame(optimalRAM);
@@ -208,7 +210,7 @@ function pageExists(pageId, ram) {
     pointerOrderList = [];
   
     for(let i = 0; i < generalProcesses.length; i++){
-      maxDuplicate = round(random(0, 10));
+      maxDuplicate = round(random(0, duplicatePointersNumber));
       pointerOrderLength = generalProcesses[i].pointerOrder.length;
       for(let j = 0; j < maxDuplicate; j++){
         randomIndex = round(random(0, pointerOrderLength-1));

@@ -21,7 +21,6 @@ async function pageFaultOptimal(selectedPage){
 
             pagesToCheck = pagesToCheck.concat(k);
         }
-        print("Page string: " + pagesToCheck);
         //await new Promise(r => setTimeout(r, 2000));
         /*
         print(pageString)

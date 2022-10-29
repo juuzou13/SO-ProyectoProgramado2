@@ -17,6 +17,7 @@ pointerAccessList = [];
 let optimalTime = 0;
 let algorithmTime = 0;
 
+let duplicatePointersNumber = 100;
 
 // ----------------------- User Algorithm -----------------------
 
@@ -45,9 +46,10 @@ algorithmInfo = {
 // Algorithm List of Marked Pages
 algMarkPages = [];
 algAuxMarkPages = [];
+algMarkIndex = -1;
 
 // Algorithm Interval Time in seconds
-intervalTimeAlg = 4;
+intervalTimeAlg = 8;
 
 // ----------------------- End of User Algorithm ----------------------- //
 
@@ -192,7 +194,7 @@ async function startExecution(algorithm){
           await optimalProcess(pageNumber);
         }
       }
-      //print("Page numbers 1: " + pageNumbers);
+      
       await new Promise(r => setTimeout(r, 1000));
 
       pointerAccessList.shift();

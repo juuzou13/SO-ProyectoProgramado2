@@ -12,6 +12,10 @@ function showRAM(title, RAM, heightPos) {
     for (let i = 0; i < 100; i++) {
         fill(RAM[i].color);
         rect(widthMargin + width / 100 * i, heightMargin+20, width / 100, 18);
+        fill(0);
+        textSize(9);
+        textAlign(LEFT);
+        text(i, widthMargin + width / 100 * i + 1, heightMargin+35);
     }
 }
 

@@ -8,33 +8,38 @@ async function agingProcess(pageNumber) {
 
 function pageHitAging(pageNumber) {
     print("Page hit");
-    print("Page: " + pageNumber);
-    print("Aging Page is already in memory");
-    print(" ");
+    if (algAuxMarkPages.includes(pageNumber) == false) {
+        algAuxMarkPages.push(pageNumber);
+    }
 }
 
 function pageFaultAging(selectedPage) {
     print("Page fault");
-    print("Page: " + selectedPage);
     
     frameToInsert = getFreeFrame(algorithmRAM);
 
     if(frameToInsert != -1){
         movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
+        algMarkPages.push({pageId: selectedPage, binary: "000000"});
     }else{
+        frameToInsert = movePageToDisk(algMarkPages[0].pageId, ramPagesAlg, algDisk, algorithmRAM);
 
+        movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
+        algMarkPages.shift();
+        algMarkPages.push({pageId: selectedPage, binary: "000000"});
+        
+        index = ramPagesAlg.map(object => object.pageId).indexOf(algMarkPages[0].pageId);
+
+        if (index != -1) {
+            ramPagesAlg[index].mark = true;
+            algMarkIndex = index;
+        } else {
+            print("Error Aging4");
+        }
     }
 }
 
 async function markAgingLoop() {
-
-    // algMarkPages = [];
-    // algAuxMarkPages = [];
-
-    // for (i = 0; i < ramPagesAlg.length; i++) {
-    //     algMarkPages.push({pageId: ramPagesAlg[i].pageId, pid: ramPagesAlg[i].pid, binary: "000000"});
-    // }
-
     await new Promise(r => setTimeout(r, intervalTimeAlg * 1000));
 
     while (pointerAccessList.length > 0) {
@@ -50,10 +55,29 @@ async function markAgingLoop() {
 
         algAuxMarkPages = [];
 
-        algMarkPages.sort((a, b) => (parseInt(a.binary, 2) > parseInt(b.binary, 2)) ? 1 : -1);
-        index = algMarkPages.indexOf((page) => page.pageId == algMarkPages[0].pageId);
-        algMarkPages[index].mark = true;
+        algMarkPages.sort((a, b) => {
+            if (parseInt(a.binary, 2) > parseInt(b.binary, 2)) {
+                return 1;
+            } else if (parseInt(a.binary, 2) == parseInt(b.binary, 2)) {
+                return 0;
+            } else {
+                return -1;
+            }
+        });
 
+        if (algMarkIndex != -1) {
+            ramPagesAlg[algMarkIndex].mark = false;
+        }
+        
+        index = ramPagesAlg.map(object => object.pageId).indexOf(algMarkPages[0].pageId);
+
+        if (index != -1) {
+            ramPagesAlg[index].mark = true;
+            algMarkIndex = index;
+        } else {
+            print("Error Aging3");
+        }
+        
         await new Promise(r => setTimeout(r, intervalTimeAlg * 1000));
     }
 }
