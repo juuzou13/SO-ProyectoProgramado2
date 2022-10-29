@@ -271,6 +271,8 @@ async function mainProgram(fileContents, algorithm){
 
   if(res){
 
+      button.hide();
+
       print("Procesos Algoritmo Optimo", generalProcesses);
       print("Procesos Activos de Optimo", activeProcesses);
       print("Lista de accesos Optimo", pointerAccessList);
@@ -278,7 +280,7 @@ async function mainProgram(fileContents, algorithm){
       await startExecution(algorithm)
 
   }else{
-      print("Error al leer el archivo");
+      window.alert("Error al leer el archivo");
   }
 }
 
