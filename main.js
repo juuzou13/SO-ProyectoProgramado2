@@ -78,7 +78,7 @@ optimalInfo = {
 
 // Optimal Algorithm Processes
 
-activeProcessesOptimal = [];
+activeProcesses = [];
 
 // --------------------------------------------------------------------- //
 
@@ -163,7 +163,7 @@ async function startExecution(algorithm){
 
       selectedProcess = pointerAccessList[0];
 
-      pN = await getPointerPages(selectedProcess);
+      pN = await getPointerPages(selectedProcess, ramPagesOpt);
       pageNumbers = pN.slice()
 
       for(let i = 0; i < pageNumbers.length; i++){
@@ -185,7 +185,6 @@ async function startExecution(algorithm){
         }
       }
       //print("Page numbers 1: " + pageNumbers);
-      print("Salio")
       await new Promise(r => setTimeout(r, 1000));
 
       pointerAccessList.shift();
@@ -200,7 +199,7 @@ async function mainProgram(fileContents, algorithm){
   if(res){
 
       print("Procesos Algoritmo Optimo", generalProcesses);
-      print("Procesos Activos de Optimo", activeProcessesOptimal);
+      print("Procesos Activos de Optimo", activeProcesses);
       print("Lista de accesos Optimo", pointerAccessList);
 
       await startExecution(algorithm)
