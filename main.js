@@ -164,60 +164,6 @@ async function setup() {
 
 }
 
-async function updateTables() {
-
-  // Optimal Algorithm
-  print("Updating tables");
-  loadedOpt = ramPagesOpt.filter((page) => page.loaded == true);
-  print("Loaded pages: ", loadedOpt);
-
-  const uniquePidOpt = [...new Set(loadedOpt.map(item => item.processId))];
-  const usageSizeOpt = loadedOpt.reduce((accumulator, object) => {
-    return accumulator + object.processSize;
-  }, 0);
-
-  print("Unique PIDs: ", uniquePidOpt);
-
-  PagesLoadedLength = loadedOpt.length;
-  pagesUnloadedLength = optimalDisk.length;
-
-  fragmentationOpt = bToKb((loadedOpt.length * 4096) - usageSizeOpt).toFixed(1);
-
-  optimalInfo.process = uniquePidOpt.length;
-  optimalInfo.RAMused = PagesLoadedLength*computer.pageSize;
-  optimalInfo.VRAMused = pagesUnloadedLength*computer.pageSize;
-  optimalInfo.PagesLoaded = PagesLoadedLength;
-  optimalInfo.PagesUnloaded = pagesUnloadedLength;
-  optimalInfo.Fragmentation = fragmentationOpt;
-
-  // Selected Algorithm
-  print("Updating tables");
-  loadedAlg = ramPagesAlg.filter((page) => page.loaded == true);
-  print("Loaded pages: ", loadedAlg);
-
-  const uniquePidAlg = [...new Set(loadedAlg.map(item => item.processId))];
-  const usageSizeAlg = loadedAlg.reduce((accumulator, object) => {
-    return accumulator + object.processSize;
-  }, 0);
-
-  print("Unique PIDs: ", uniquePidAlg);
-
-  PagesLoadedAlgLength = loadedAlg.length;
-  pagesUnloadedAlgLength = algDisk.length;
-
-  fragmentationAlg = bToKb((loadedAlg.length * 4096) - usageSizeAlg).toFixed(1);
-
-  algorithmInfo.process = uniquePidAlg.length;
-  algorithmInfo.RAMused = PagesLoadedAlgLength*computer.pageSize;
-  algorithmInfo.VRAMused = pagesUnloadedAlgLength*computer.pageSize;
-  algorithmInfo.PagesLoaded = PagesLoadedAlgLength;
-  algorithmInfo.PagesUnloaded = pagesUnloadedAlgLength;
-  algorithmInfo.Fragmentation = fragmentationAlg;
-
-
-
-}
-
 async function startExecution(algorithm){
 
   if (algorithm == "Aging"){
@@ -303,6 +249,49 @@ function sumTimeToPagesInRam(ram, time){
       ram[i].loadedTime += time;
     }
   }
+}
+
+async function updateTables() {
+
+  // Optimal Algorithm
+  loadedOpt = ramPagesOpt.filter((page) => page.loaded == true);
+  
+  const uniquePidOpt = [...new Set(loadedOpt.map(item => item.processId))];
+  const usageSizeOpt = loadedOpt.reduce((accumulator, object) => {
+    return accumulator + object.processSize;
+  }, 0);
+
+  PagesLoadedLength = loadedOpt.length;
+  pagesUnloadedLength = optimalDisk.length;
+
+  fragmentationOpt = bToKb((loadedOpt.length * 4096) - usageSizeOpt).toFixed(1);
+
+  optimalInfo.process = uniquePidOpt.length;
+  optimalInfo.RAMused = PagesLoadedLength*computer.pageSize;
+  optimalInfo.VRAMused = pagesUnloadedLength*computer.pageSize;
+  optimalInfo.PagesLoaded = PagesLoadedLength;
+  optimalInfo.PagesUnloaded = pagesUnloadedLength;
+  optimalInfo.Fragmentation = fragmentationOpt;
+
+  // Selected Algorithm
+  loadedAlg = ramPagesAlg.filter((page) => page.loaded == true);
+
+  const uniquePidAlg = [...new Set(loadedAlg.map(item => item.processId))];
+  const usageSizeAlg = loadedAlg.reduce((accumulator, object) => {
+    return accumulator + object.processSize;
+  }, 0);
+
+  PagesLoadedAlgLength = loadedAlg.length;
+  pagesUnloadedAlgLength = algDisk.length;
+
+  fragmentationAlg = bToKb((loadedAlg.length * 4096) - usageSizeAlg).toFixed(1);
+
+  algorithmInfo.process = uniquePidAlg.length;
+  algorithmInfo.RAMused = PagesLoadedAlgLength*computer.pageSize;
+  algorithmInfo.VRAMused = pagesUnloadedAlgLength*computer.pageSize;
+  algorithmInfo.PagesLoaded = PagesLoadedAlgLength;
+  algorithmInfo.PagesUnloaded = pagesUnloadedAlgLength;
+  algorithmInfo.Fragmentation = fragmentationAlg;
 }
 
 function getRandomColor() {
