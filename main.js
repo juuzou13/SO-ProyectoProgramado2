@@ -163,7 +163,7 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  await mainProgram(fileContents, "Second Chance");
+  await mainProgram(fileContents, "Random");
 
 }
 
@@ -195,7 +195,7 @@ async function startExecution(algorithm){
         } else if (algorithm=="Aging"){
           await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
         } else if (algorithm=="Random"){
-          // await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
+          await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
         } else {
           await optimalProcess(pageNumber);
         }
