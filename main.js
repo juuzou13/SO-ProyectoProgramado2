@@ -49,6 +49,9 @@ algMarkPages = [];
 algAuxMarkPages = [];
 algMarkIndex = -1;
 
+// Additional pointer
+pointer = 0
+
 // Algorithm Interval Time in seconds
 intervalTimeAlg = 8;
 
@@ -160,7 +163,7 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  await mainProgram(fileContents, "Aging");
+  await mainProgram(fileContents, "Second Chance");
 
 }
 
@@ -188,7 +191,7 @@ async function startExecution(algorithm){
         if (algorithm=="LRU"){
           // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
         } else if (algorithm=="Second Chance"){
-          // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
+          await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
         } else if (algorithm=="Aging"){
           await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
         } else if (algorithm=="Random"){
