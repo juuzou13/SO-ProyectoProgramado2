@@ -8,9 +8,6 @@ async function secondChanceProcess(pageNumber) {
 
 function pageHitSecondChance(pageNumber) {
     print("Page hit Second Chance");
-    if (algAuxMarkPages.includes(pageNumber) == false) {
-        algAuxMarkPages.push(pageNumber);
-    }
     let index = algMarkPages.findIndex(object => { return object.pageId === pageNumber; });
     algMarkPages[index].chance = 1;
 }
