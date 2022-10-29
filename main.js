@@ -19,7 +19,6 @@ let optimalTime = 0;
 let algorithmTime = 0;
 
 let duplicatePointersNumber = 50;
-let selectedAlgorithm = "";
 
 // ----------------------- User Algorithm -----------------------
 
@@ -144,7 +143,7 @@ let fileContents;
 function preload() {
   img = loadImage('/a.jpg');
   img2 = loadImage('/b.jpg');
-  fileContents = loadStrings("procesos.txt");
+  // fileContents = loadStrings("procesos.txt");
 }
 
 async function setup() {
@@ -161,14 +160,33 @@ async function setup() {
   //   seed = 1;
   // }
 
-  mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
-  mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
+  mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 180);
+  mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 180);
+
+  setConfig();
+}
+
+function processFile(file) {
+  fileContents = loadStrings(file.name);
+}
+
+function textConfigs() {
+  fill(0);
+  textSize(12);
+  textAlign(LEFT, TOP);
+  text("1. Seleccione el archivo con la lista de accesos", 10, 10);
+  text("2. Seleccione el segundo algoritmo a visualizar", 305, 10);
+  text("3. Ingrese un número entero positivo para la seed (default: 1)", 600, 10);
+  text("4. Inicie la simulación", 960, 10);
+}
+
+async function setConfig() {
 
   fileInput = createFileInput(processFile);
-  fileInput.position(0, 0);
+  fileInput.position(10, 30);
 
   algorithm = createSelect();
-  algorithm.position(350, 0);
+  algorithm.position(305, 30);
   algorithm.option("LRU");
   algorithm.option("Second Chance");
   algorithm.option("Aging");
@@ -176,25 +194,22 @@ async function setup() {
   algorithm.selected("LRU");
 
   seed = createInput();
-  seed.position(500, 0);
+  seed.position(600, 30);
 
   button = createButton("Simular");
-  button.position(775, 0);
+  button.position(960, 30);
   button.mousePressed(runMainProgram);
-
-}
-
-function processFile(file) {
-  fileContents = loadStrings(file.name);
 }
 
 async function runMainProgram() {
   if(fileContents == undefined) {
-    prompt("Seleccione un archivo de texto");
-  } else if(seed.value() == "") {
-    prompt("Ingrese una semilla");
+    alert("Seleccione un archivo de texto con la lista de accesos");
   } else {
-    randomSeed(seed.value());
+    if (seed.value() != "") {
+      randomSeed(seed.value());
+    } else {
+      randomSeed(1);
+    }
     await mainProgram(fileContents, algorithm.value());
   }
 }
@@ -269,15 +284,16 @@ async function mainProgram(fileContents, algorithm){
 
 function draw() {
   background(255);
+  textConfigs();
   // image(img, 200, 600, 350, 250);
   image(img, 0, windowHeight/2, img.width/2, img.height/2);
-  image(img2, windowWidth - img2.width/4.5, windowHeight/2, img2.width/4.5, img2.height/4.5);
-  showRAM("RAM - OPTIMAL ALG", optimalRAM, 0);
-  showRAM(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmRAM, 60);
+  image(img2, windowWidth - img2.width/6, windowHeight/2, img2.width/6, img2.height/6);
+  showRAM("RAM - OPTIMAL ALG", optimalRAM, 70);
+  showRAM(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmRAM, 130);
   mmuOpt.html(generateHtmlTableInfo("MMU - OPTIMAL ALG", ramPagesOpt));
   mmuAlg.html(generateHtmlTableInfo(`RAM - ${algorithm.value().toUpperCase()} ALG`, ramPagesAlg));
-  showInfoTable("MMU - OPTIMAL ALG", optimalInfo, 300, 510);
-  showInfoTable(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmInfo, 900, 510);
+  showInfoTable("MMU - OPTIMAL ALG", optimalInfo, 300, 540);
+  showInfoTable(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmInfo, 900, 540);
 }
 
 function sumTimeToPagesInRam(ram, time){

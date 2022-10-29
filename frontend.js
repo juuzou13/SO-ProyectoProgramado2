@@ -1,6 +1,6 @@
 function showRAM(title, RAM, heightPos) {
     widthMargin = windowWidth * 0.1;
-    heightMargin = windowHeight * 0.04 + heightPos;
+    heightMargin = heightPos;
     width = windowWidth - widthMargin * 2;
     fill(0);
     fill(255);
@@ -8,14 +8,14 @@ function showRAM(title, RAM, heightPos) {
     fill(0);
     textSize(14);
     textAlign(CENTER);
-    text(title, widthMargin + width/2, heightMargin + 15);
+    text(title, widthMargin + width/2, heightMargin + 4);
     for (let i = 0; i < computer.framesQuantity; i++) {
         fill(RAM[i].color);
         rect(widthMargin + width / 100 * i, heightMargin+20, width / 100, 18);
         fill(0);
         textSize(9);
         textAlign(LEFT);
-        text(i, widthMargin + width / 100 * i + 1, heightMargin+35);
+        text(i, widthMargin + width / 100 * i + 2, heightMargin+29);
     }
 }
 
@@ -90,7 +90,7 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text(title, widthPos + width/2, heightPos + 13);
+    text(title, widthPos + width/2, heightPos + 4);
 
     heightPos += 18;
 
@@ -99,14 +99,14 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("Processes", widthPos + width/4, heightPos + 13);
+    text("Processes", widthPos + width/4, heightPos + 4);
 
     fill(255);
     rect(widthPos + width/2, heightPos, width/2, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("Simulation Time", widthPos + width/2 + width/4, heightPos + 13);
+    text("Simulation Time", widthPos + width/2 + width/4, heightPos + 4);
 
     heightPos += 18;
 
@@ -115,14 +115,14 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(info.process, widthPos + width/4, heightPos + 20);
+    text(info.process, widthPos + width/4, heightPos + 10);
 
     fill(255);
     rect(widthPos + width/2, heightPos, width/2, 30);
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.simulationTime}s`, widthPos + width/2 + width/4, heightPos + 20);
+    text(`${info.simulationTime}s`, widthPos + width/2 + width/4, heightPos + 10);
 
     heightPos += 30;
     heightPos += 10;
@@ -132,28 +132,28 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("RAM KB", widthPos + width/8, heightPos + 13);
+    text("RAM KB", widthPos + width/8, heightPos + 4);
 
     fill(255);
     rect(widthPos + width/4, heightPos, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("RAM %", widthPos + width/4 + width/8, heightPos + 13);
+    text("RAM %", widthPos + width/4 + width/8, heightPos + 4);
 
     fill(255);
     rect(widthPos + width/2, heightPos, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("V-RAM KB", widthPos + width/2 + width/8, heightPos + 13);
+    text("V-RAM KB", widthPos + width/2 + width/8, heightPos + 4);
 
     fill(255);
     rect(widthPos + width/4 * 3, heightPos, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("V-RAM %", widthPos + width/4 * 3 + width/8, heightPos + 13);
+    text("V-RAM %", widthPos + width/4 * 3 + width/8, heightPos + 4);
 
     heightPos += 18;
 
@@ -162,21 +162,21 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(info.RAMused, widthPos + width/8, heightPos + 20);
+    text(info.RAMused, widthPos + width/8, heightPos + 10);
 
     fill(255);
     rect(widthPos + width/4, heightPos, width/4, 30);
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.RAMused / computer.ramSize * 100}%`, widthPos + width/4 + width/8, heightPos + 20);
+    text(`${info.RAMused / computer.ramSize * 100}%`, widthPos + width/4 + width/8, heightPos + 10);
 
     fill(255);
     rect(widthPos + width/2, heightPos, width/4, 30);
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(info.VRAMused, widthPos + width/2 + width/8, heightPos + 20);
+    text(info.VRAMused, widthPos + width/2 + width/8, heightPos + 10);
 
     vramPercent = (info.VRAMused / computer.ramSize * 100).toFixed(1);
 
@@ -185,7 +185,7 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${vramPercent}%`, widthPos + width/4 * 3 + width/8, heightPos + 20);
+    text(`${vramPercent}%`, widthPos + width/4 * 3 + width/8, heightPos + 10);
 
     heightPos += 30;
     heightPos += 10;
@@ -195,7 +195,7 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("Pages", widthPos + width/4, heightPos + 13);
+    text("Pages", widthPos + width/4, heightPos + 4);
     
     if(info.simulationTime == 0) {
         thrasingPercent = 0;
@@ -219,14 +219,14 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(color2);
     textSize(11);
     textAlign(CENTER);
-    text("Thrashing", widthPos + width/2 + width/8, heightPos + 13);
+    text("Thrashing", widthPos + width/2 + width/8, heightPos + 4);
 
     fill(255);
     rect(widthPos + width/4 * 3, heightPos, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("Fragmentation", widthPos + width/4 * 3 + width/8, heightPos + 13);
+    text("Fragmentation", widthPos + width/4 * 3 + width/8, heightPos + 4);
 
     heightPos += 18;
 
@@ -235,47 +235,47 @@ function showInfoTable(title, info, widthPos, heightPos) {
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("LOADED", widthPos + width/8, heightPos + 13);
+    text("LOADED", widthPos + width/8, heightPos + 4);
 
     fill(255);
     rect(widthPos, heightPos+18, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text(info.PagesLoaded, widthPos + width/8, heightPos + 18 + 13);
+    text(info.PagesLoaded, widthPos + width/8, heightPos + 18 + 4);
 
     fill(255);
     rect(widthPos + width/4, heightPos, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text("UNLOADED", widthPos + width/4 + width/8, heightPos + 13);
+    text("UNLOADED", widthPos + width/4 + width/8, heightPos + 4);
 
     fill(255);
     rect(widthPos + width/4, heightPos+18, width/4, 18);
     fill(0);
     textSize(11);
     textAlign(CENTER);
-    text(info.PagesUnloaded, widthPos + width/4 + width/8, heightPos + 18 + 13);
+    text(info.PagesUnloaded, widthPos + width/4 + width/8, heightPos + 18 + 4);
 
     fill(color1);
     rect(widthPos + width/2, heightPos, width/8, 36);
     fill(color2);
     textSize(12);
     textAlign(CENTER);
-    text(`${info.TrashingTime}s`, widthPos + width/2 + width/16, heightPos + 22);
+    text(`${info.TrashingTime}s`, widthPos + width/2 + width/16, heightPos + 14);
 
     fill(color1);
     rect(widthPos + width/2 + width/8, heightPos, width/8, 36);
     fill(color2);
     textSize(12);
     textAlign(CENTER);
-    text(`${thrasingPercent}%`, widthPos + width/2 + (width/16 * 3), heightPos + 22);
+    text(`${thrasingPercent}%`, widthPos + width/2 + (width/16 * 3), heightPos + 14);
 
     fill(255);
     rect(widthPos + width/4 * 3, heightPos, width/4, 36);
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.Fragmentation}KB`, widthPos + width/4 * 3 + width/8, heightPos + 22);
+    text(`${info.Fragmentation}KB`, widthPos + width/4 * 3 + width/8, heightPos + 14);
 }
