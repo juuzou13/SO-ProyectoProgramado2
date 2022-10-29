@@ -91,6 +91,10 @@ optimalInfo = {
 
 activeProcesses = [];
 
+let fileInput;
+let seed;
+let algorithm;
+
 // --------------------------------------------------------------------- //
 
 /*
@@ -145,33 +149,56 @@ function preload() {
 
 async function setup() {
 
-  var seed;
+  createCanvas(windowWidth, windowHeight);
 
+  for (let i = 0; i < computer.framesQuantity; i++) {
+    optimalRAM.push({frameNumber: i, pageID:-1, color: white});
+    algorithmRAM.push({frameNumber: i, pageID:-1, color: white});
+  }
   // seed = prompt("Ingrese un número entero positivo para la seed (default: 1)", "");
   // seed = parseInt(seed, 10);
   // if (!(seed != null && Number.isInteger(seed) && seed >= 0)) {
   //   seed = 1;
   // }
 
-  seed = random(1000000);
-
-  // acá se establece la seed para los numeros aleatorios
-  randomSeed(seed);
-
-  createCanvas(windowWidth, windowHeight);
-  for (let i = 0; i < computer.framesQuantity; i++) {
-    optimalRAM.push({frameNumber: i, pageID:-1, color: white});
-    algorithmRAM.push({frameNumber: i, pageID:-1, color: white});
-  }
-  
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
 
-  selectedAlgorithm = "Random";
-  
-  await mainProgram(fileContents, selectedAlgorithm);
+  fileInput = createFileInput(processFile);
+  fileInput.position(0, 0);
+
+  algorithm = createSelect();
+  algorithm.position(350, 0);
+  algorithm.option("LRU");
+  algorithm.option("Second Chance");
+  algorithm.option("Aging");
+  algorithm.option("Random");
+  algorithm.selected("LRU");
+
+  seed = createInput();
+  seed.position(500, 0);
+
+  button = createButton("Simular");
+  button.position(775, 0);
+  button.mousePressed(runMainProgram);
 
 }
+
+function processFile(file) {
+  fileContents = loadStrings(file.name);
+}
+
+async function runMainProgram() {
+  if(fileContents == undefined) {
+    prompt("Seleccione un archivo de texto");
+  } else if(seed.value() == "") {
+    prompt("Ingrese una semilla");
+  } else {
+    randomSeed(seed.value());
+    await mainProgram(fileContents, algorithm.value());
+  }
+}
+
 
 async function startExecution(algorithm){
 
@@ -195,7 +222,7 @@ async function startExecution(algorithm){
         print(i, pointerAccessList)
         
         if (algorithm=="LRU"){
-          // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
+          await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
         } else if (algorithm=="Second Chance"){
           await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
         } else if (algorithm=="Aging"){
@@ -246,11 +273,11 @@ function draw() {
   image(img, 0, windowHeight/2, img.width/2, img.height/2);
   image(img2, windowWidth - img2.width/4.5, windowHeight/2, img2.width/4.5, img2.height/4.5);
   showRAM("RAM - OPTIMAL ALG", optimalRAM, 0);
-  showRAM(`RAM - ${selectedAlgorithm.toUpperCase()} ALG`, algorithmRAM, 60);
+  showRAM(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmRAM, 60);
   mmuOpt.html(generateHtmlTableInfo("MMU - OPTIMAL ALG", ramPagesOpt));
-  mmuAlg.html(generateHtmlTableInfo(`RAM - ${selectedAlgorithm.toUpperCase()} ALG`, ramPagesAlg));
+  mmuAlg.html(generateHtmlTableInfo(`RAM - ${algorithm.value().toUpperCase()} ALG`, ramPagesAlg));
   showInfoTable("MMU - OPTIMAL ALG", optimalInfo, 300, 510);
-  showInfoTable(`RAM - ${selectedAlgorithm.toUpperCase()} ALG`, algorithmInfo, 900, 510);
+  showInfoTable(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmInfo, 900, 510);
 }
 
 function sumTimeToPagesInRam(ram, time){
