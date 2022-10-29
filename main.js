@@ -19,6 +19,7 @@ let optimalTime = 0;
 let algorithmTime = 0;
 
 let duplicatePointersNumber = 50;
+let selectedAlgorithm = "";
 
 // ----------------------- User Algorithm -----------------------
 
@@ -131,12 +132,14 @@ activeProcesses = [];
 // }
 
 let img;
+let img2;
 const white = "#FFFFFF";
 
 let fileContents;
 
 function preload() {
-  img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
+  img = loadImage('/a.jpg');
+  img2 = loadImage('/b.jpg');
   fileContents = loadStrings("procesos.txt");
 }
 
@@ -160,10 +163,13 @@ async function setup() {
     optimalRAM.push({frameNumber: i, pageID:-1, color: white});
     algorithmRAM.push({frameNumber: i, pageID:-1, color: white});
   }
+  
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
+
+  selectedAlgorithm = "Random";
   
-  await mainProgram(fileContents, "Random");
+  await mainProgram(fileContents, selectedAlgorithm);
 
 }
 
@@ -236,14 +242,15 @@ async function mainProgram(fileContents, algorithm){
 
 function draw() {
   background(255);
-  imageMode(CENTER);
-  image(img, 200, 600, 350, 250);
-  showRAM("RAM - OPT", optimalRAM, 0);
-  showRAM("RAM - ALG", algorithmRAM, 60);
-  mmuOpt.html(generateHtmlTableInfo("MMU - OPT", ramPagesOpt));
-  mmuAlg.html(generateHtmlTableInfo("MMU - ALG", ramPagesAlg));
-  showInfoTable("MMU - OPT", optimalInfo, 300, 510);
-  showInfoTable("MMU - ALG", algorithmInfo, 900, 510);
+  // image(img, 200, 600, 350, 250);
+  image(img, 0, windowHeight/2, img.width/2, img.height/2);
+  image(img2, windowWidth - img2.width/4.5, windowHeight/2, img2.width/4.5, img2.height/4.5);
+  showRAM("RAM - OPTIMAL ALG", optimalRAM, 0);
+  showRAM(`RAM - ${selectedAlgorithm.toUpperCase()} ALG`, algorithmRAM, 60);
+  mmuOpt.html(generateHtmlTableInfo("MMU - OPTIMAL ALG", ramPagesOpt));
+  mmuAlg.html(generateHtmlTableInfo(`RAM - ${selectedAlgorithm.toUpperCase()} ALG`, ramPagesAlg));
+  showInfoTable("MMU - OPTIMAL ALG", optimalInfo, 300, 510);
+  showInfoTable(`RAM - ${selectedAlgorithm.toUpperCase()} ALG`, algorithmInfo, 900, 510);
 }
 
 function sumTimeToPagesInRam(ram, time){
