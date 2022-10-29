@@ -157,7 +157,7 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  await mainProgram(fileContents, "Aging");
+  await mainProgram(fileContents, "LRU");
 
 }
 
@@ -173,15 +173,18 @@ async function startExecution(algorithm){
 
       pN = await getPointerPages(selectedProcess, ramPagesOpt);
       pageNumbers = pN.slice()
+      print("pageNumbers: " + pageNumbers);
 
       for(let i = 0; i < pageNumbers.length; i++){
         
         //await new Promise(r => setTimeout(r, 1));
         pageNumber = pageNumbers[i];
+        print("pageNumber: " + pageNumber);
         print(i, pointerAccessList)
         
         if (algorithm=="LRU"){
-          // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
+          await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
+          //await lruProcess(pageNumber);
         } else if (algorithm=="Second Chance"){
           // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
         } else if (algorithm=="Aging"){
