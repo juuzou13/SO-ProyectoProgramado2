@@ -205,7 +205,7 @@ async function runMainProgram() {
   if(fileContents == undefined) {
     alert("Seleccione un archivo de texto con la lista de accesos");
   } else {
-    if (seed.value() != "" && isNaN(seed.value())) {
+    if (seed.value() != "" && !isNaN(seed.value())) {
       randomSeed(seed.value());
     } else {
       randomSeed(1);
