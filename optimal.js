@@ -1,31 +1,3 @@
-async function runOptimal(fileContents){
-
-    res = await loadProcesses(fileContents);
-  
-    if(res){
-
-        print("Procesos Algoritmo Optimo", generalProcesses);
-        print("Procesos Activos de Optimo", activeProcessesOptimal);
-        print("Lista de accesos Optimo", pointerAccessList);
-        
-        /*
-        movePageToDisk(3);
-        movePageToDisk(9)
-        movePageToRam(9,18)
-        movePageToDisk(0)
-        movePageToDisk(8)
-        */
-
-        //print(ramPagesOpt)
-        //print(optimalDisk)
-
-        startExecution()
-
-    }else{
-        print("Error al leer el archivo");
-    }
-}
-
 function pageExists(pageId) {
   for (let i = 0; i < ramPagesOpt.length; i++) {
     if (ramPagesOpt[i].pageId == pageId) {
@@ -360,44 +332,6 @@ function getPointerPages(selectedPointer){
     pageN = pagesWithPointer.map((page) => {return page.pageId});
     
     return pageN.slice()
-}
-
-async function startExecution(algorithm){
-
-    while(pointerAccessList.length > 0){
-
-        selectedProcess = pointerAccessList[0];
-
-        pN = await getPointerPages(selectedProcess);
-        pageNumbers = pN.slice()
-
-        for(let i = 0; i < pageNumbers.length; i++){
-          
-          //await new Promise(r => setTimeout(r, 1));
-          pageNumber = pageNumbers[i];
-          print(i, pointerAccessList)
-          
-          if (algorithm=="LRU"){
-            // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
-          } else if (algorithm=="Second Chance"){
-            // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
-          } else if (algorithm=="Aging"){
-            // await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
-          } else if (algorithm=="Random"){
-            // await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
-          } else {
-            await optimalProcess(pageNumber);
-          }
-        }
-        //print("Page numbers 1: " + pageNumbers);
-        print("Salio")
-        await new Promise(r => setTimeout(r, 1000));
-
-        
-
-        pointerAccessList.shift();
-
-    }
 }
 
 async function optimalProcess(pageNumber){

@@ -101,8 +101,6 @@ activeProcessesOptimal = [];
   { pageId: 15, processId: 4, loaded: false, lAddr: 15, mAddr: -1, dAddr: 7, loadedTime: 1, mark: false, processSize: 954, color: "#7C3238" },
 */
 
-
-
 // page = {
 //   pageId: 0,
 //   processId: 0,
@@ -155,8 +153,61 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  runOptimal(fileContents);
+  await mainProgram(fileContents);
 
+}
+
+async function startExecution(algorithm){
+
+  while(pointerAccessList.length > 0){
+
+      selectedProcess = pointerAccessList[0];
+
+      pN = await getPointerPages(selectedProcess);
+      pageNumbers = pN.slice()
+
+      for(let i = 0; i < pageNumbers.length; i++){
+        
+        //await new Promise(r => setTimeout(r, 1));
+        pageNumber = pageNumbers[i];
+        print(i, pointerAccessList)
+        
+        if (algorithm=="LRU"){
+          // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
+        } else if (algorithm=="Second Chance"){
+          // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
+        } else if (algorithm=="Aging"){
+          // await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
+        } else if (algorithm=="Random"){
+          // await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
+        } else {
+          await optimalProcess(pageNumber);
+        }
+      }
+      //print("Page numbers 1: " + pageNumbers);
+      print("Salio")
+      await new Promise(r => setTimeout(r, 1000));
+
+      pointerAccessList.shift();
+
+  }
+}
+
+async function mainProgram(fileContents, algorithm){
+
+  res = await loadProcesses(fileContents);
+
+  if(res){
+
+      print("Procesos Algoritmo Optimo", generalProcesses);
+      print("Procesos Activos de Optimo", activeProcessesOptimal);
+      print("Lista de accesos Optimo", pointerAccessList);
+
+      await startExecution(algorithm)
+
+  }else{
+      print("Error al leer el archivo");
+  }
 }
 
 function draw() {
