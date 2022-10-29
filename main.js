@@ -163,7 +163,7 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  await mainProgram(fileContents, "Random");
+  await mainProgram(fileContents, "LRU");
 
 }
 
@@ -189,7 +189,7 @@ async function startExecution(algorithm){
         print(i, pointerAccessList)
         
         if (algorithm=="LRU"){
-          // await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
+          await Promise.all([optimalProcess(pageNumber), lruProcess(pageNumber)]);
         } else if (algorithm=="Second Chance"){
           await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
         } else if (algorithm=="Aging"){
