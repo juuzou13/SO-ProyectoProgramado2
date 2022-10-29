@@ -7,14 +7,14 @@ async function agingProcess(pageNumber) {
 }
 
 function pageHitAging(pageNumber) {
-    print("Page hit");
+    print("Page hit Aging");
     if (algAuxMarkPages.includes(pageNumber) == false) {
         algAuxMarkPages.push(pageNumber);
     }
 }
 
 function pageFaultAging(selectedPage) {
-    print("Page fault");
+    print("Page fault Aging");
     
     frameToInsert = getFreeFrame(algorithmRAM);
 

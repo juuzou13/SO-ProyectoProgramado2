@@ -59,7 +59,7 @@ function pageExists(pageId, ram) {
   }
   
   
-  function movePageToRam(pageID, frameID, ram, disk){
+  function movePageToRam(pageID, frameID, ram, disk, graphicRam){
     
     mmuPageIndexInRam = ram.indexOf(ram.find(page => page.pageId == pageID));
   
@@ -77,8 +77,10 @@ function pageExists(pageId, ram) {
 
     if(ram == ramPagesOpt){
         optimalTime += 4;
+        optimalInfo.TrashingTime += 5;
     }else{
         algorithmTime += 4;
+        algorithmInfo.TrashingTime += 5;
     }
   
   }
@@ -282,3 +284,4 @@ function pageExists(pageId, ram) {
     
     return pageN.slice()
   }
+

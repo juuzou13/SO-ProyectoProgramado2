@@ -1,5 +1,5 @@
 function pageHitOptimal(selectedPage){
-    print("Page hit");
+    print("Page hit Optimal");
 }
 
 function getLongestPageInRam(ram){
@@ -47,7 +47,7 @@ function getPagesFromPointerList(pointerList){
 }
 
 async function pageFaultOptimal(selectedPage, exclusionList){
-    print("Page fault");
+    print("Page fault Optimal");
     frameToInsert = getFreeFrame(optimalRAM);
     
     
@@ -58,7 +58,6 @@ async function pageFaultOptimal(selectedPage, exclusionList){
 
         let futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
         let k = getPagesFromPointerList(futurePointers);
-        print("future pages", k)
         let referenceString = k;
 
         let pagesInRam = optimalRAM.map((page) => page.pageID);
@@ -101,7 +100,6 @@ async function pageFaultOptimal(selectedPage, exclusionList){
               latterPage = pageToLookIntoFuture;
             }
           } else {
-            print("found")
             let pagesLength = pagesNeverReferencedAgain.length;
 
             if (pagesLength == 1) {
@@ -114,11 +112,7 @@ async function pageFaultOptimal(selectedPage, exclusionList){
 
         }
 
-        console.log("Page In", selectedPage)
         frameToInsert = getFrameFromPage(latterPage, optimalRAM);
-        console.log("Page Out", latterPage, "from frame", frameToInsert)
-
-        await new Promise(r => setTimeout(r, 1000));
 
         movePageToDisk(latterPage, ramPagesOpt, optimalDisk, optimalRAM);
         movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);

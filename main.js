@@ -6,7 +6,8 @@ computer = {
   ramSize: 400,
   diskSize: Number.MAX_SAFE_INTEGER,
   pageSize: 4,
-  framesQuantity: 12 / 4,
+  framesQuantity: 400 / 4,
+  // framesQuantity: 12 / 4,
 }
 
 // General Variables
@@ -17,7 +18,7 @@ pointerAccessList = [];
 let optimalTime = 0;
 let algorithmTime = 0;
 
-let duplicatePointersNumber = 100;
+let duplicatePointersNumber = 50;
 
 // ----------------------- User Algorithm -----------------------
 
@@ -33,14 +34,14 @@ algorithmRAM = [];
 
 // Algorithm Information
 algorithmInfo = {
-  process: 7,
-  simulationTime: 400,
-  RAMused: 200,
-  VRAMused: 346,
-  PagesLoaded: 83,
-  PagesUnloaded: 60,
-  TrashingTime: 300,
-  Fragmentation: 172,
+  process: 0,
+  simulationTime: 0,
+  RAMused: 0,
+  VRAMused: 0,
+  PagesLoaded: 0,
+  PagesUnloaded: 0,
+  TrashingTime: 0,
+  Fragmentation: 0,
 }
 
 // Algorithm List of Marked Pages
@@ -132,7 +133,7 @@ const white = "#FFFFFF";
 let fileContents;
 
 function preload() {
-  //img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
+  img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
   fileContents = loadStrings("procesos.txt");
 }
 
@@ -159,19 +160,69 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  await mainProgram(fileContents);
+  await mainProgram(fileContents, "Aging");
 
 }
 
-function sumTimeToPagesInRam(ram, time){
-  for (let i = 0; i < ram.length; i++) {
-    if (ram[i].loaded != false) {
-      ram[i].loadedTime += time;
-    }
-  }
+async function updateTables() {
+
+  // Optimal Algorithm
+  print("Updating tables");
+  loadedOpt = ramPagesOpt.filter((page) => page.loaded == true);
+  print("Loaded pages: ", loadedOpt);
+
+  const uniquePidOpt = [...new Set(loadedOpt.map(item => item.processId))];
+  const usageSizeOpt = loadedOpt.reduce((accumulator, object) => {
+    return accumulator + object.processSize;
+  }, 0);
+
+  print("Unique PIDs: ", uniquePidOpt);
+
+  PagesLoadedLength = loadedOpt.length;
+  pagesUnloadedLength = optimalDisk.length;
+
+  fragmentationOpt = bToKb((loadedOpt.length * 4096) - usageSizeOpt).toFixed(1);
+
+  optimalInfo.process = uniquePidOpt.length;
+  optimalInfo.RAMused = PagesLoadedLength*computer.pageSize;
+  optimalInfo.VRAMused = pagesUnloadedLength*computer.pageSize;
+  optimalInfo.PagesLoaded = PagesLoadedLength;
+  optimalInfo.PagesUnloaded = pagesUnloadedLength;
+  optimalInfo.Fragmentation = fragmentationOpt;
+
+  // Selected Algorithm
+  print("Updating tables");
+  loadedAlg = ramPagesAlg.filter((page) => page.loaded == true);
+  print("Loaded pages: ", loadedAlg);
+
+  const uniquePidAlg = [...new Set(loadedAlg.map(item => item.processId))];
+  const usageSizeAlg = loadedAlg.reduce((accumulator, object) => {
+    return accumulator + object.processSize;
+  }, 0);
+
+  print("Unique PIDs: ", uniquePidAlg);
+
+  PagesLoadedAlgLength = loadedAlg.length;
+  pagesUnloadedAlgLength = algDisk.length;
+
+  fragmentationAlg = bToKb((loadedAlg.length * 4096) - usageSizeAlg).toFixed(1);
+
+  algorithmInfo.process = uniquePidAlg.length;
+  algorithmInfo.RAMused = PagesLoadedAlgLength*computer.pageSize;
+  algorithmInfo.VRAMused = pagesUnloadedAlgLength*computer.pageSize;
+  algorithmInfo.PagesLoaded = PagesLoadedAlgLength;
+  algorithmInfo.PagesUnloaded = pagesUnloadedAlgLength;
+  algorithmInfo.Fragmentation = fragmentationAlg;
+
+
+
 }
 
 async function startExecution(algorithm){
+
+  if (algorithm == "Aging"){
+    markAgingLoop();
+  }
 
   while(pointerAccessList.length > 0){
       await new Promise(r => setTimeout(r, 1000));
@@ -185,7 +236,6 @@ async function startExecution(algorithm){
 
       for(let i = 0; i < pageNumbers.length; i++){
         
-        //await new Promise(r => setTimeout(r, 1));
         pageNumber = pageNumbers[i];
         print(i, pointerAccessList)
         
@@ -194,22 +244,24 @@ async function startExecution(algorithm){
         } else if (algorithm=="Second Chance"){
           // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
         } else if (algorithm=="Aging"){
-          // await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
+          await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
         } else if (algorithm=="Random"){
           // await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
         } else {
           await optimalProcess(pageNumber);
         }
+
+        optimalTime += 1;
+        algorithmTime += 1;
       }
-      
-      await new Promise(r => setTimeout(r, 1000));
-      //print("Page numbers 1: " + pageNumbers);
-      
-      optimalTime += 1;
-      algorithmTime += 1;
 
       sumTimeToPagesInRam(ramPagesOpt, optimalTime);
       sumTimeToPagesInRam(ramPagesAlg, algorithmTime);
+
+      optimalInfo.simulationTime += optimalTime;
+      algorithmInfo.simulationTime += algorithmTime;
+
+      updateTables();
 
       pointerAccessList.shift();
 
@@ -236,13 +288,21 @@ async function mainProgram(fileContents, algorithm){
 function draw() {
   background(255);
   imageMode(CENTER);
-  //image(img, 200, 600, 350, 250);
+  image(img, 200, 600, 350, 250);
   showRAM("RAM - OPT", optimalRAM, 0);
   showRAM("RAM - ALG", algorithmRAM, 60);
   mmuOpt.html(generateHtmlTableInfo("MMU - OPT", ramPagesOpt));
   mmuAlg.html(generateHtmlTableInfo("MMU - ALG", ramPagesAlg));
   showInfoTable("MMU - OPT", optimalInfo, 300, 510);
   showInfoTable("MMU - ALG", algorithmInfo, 900, 510);
+}
+
+function sumTimeToPagesInRam(ram, time){
+  for (let i = 0; i < ram.length; i++) {
+    if (ram[i].loaded != false) {
+      ram[i].loadedTime += time;
+    }
+  }
 }
 
 function getRandomColor() {

@@ -178,12 +178,14 @@ function showInfoTable(title, info, widthPos, heightPos) {
     textAlign(CENTER);
     text(info.VRAMused, widthPos + width/2 + width/8, heightPos + 20);
 
+    vramPercent = (info.VRAMused / computer.ramSize * 100).toFixed(1);
+
     fill(255);
     rect(widthPos + width/4 * 3, heightPos, width/4, 30);
     fill(0);
     textSize(13);
     textAlign(CENTER);
-    text(`${info.VRAMused / computer.ramSize * 100}%`, widthPos + width/4 * 3 + width/8, heightPos + 20);
+    text(`${vramPercent}%`, widthPos + width/4 * 3 + width/8, heightPos + 20);
 
     heightPos += 30;
     heightPos += 10;
@@ -198,7 +200,7 @@ function showInfoTable(title, info, widthPos, heightPos) {
     if(info.simulationTime == 0) {
         thrasingPercent = 0;
     }else{
-        thrasingPercent = info.TrashingTime / info.simulationTime * 100;
+        thrasingPercent = (info.TrashingTime / info.simulationTime * 100).toFixed(1);
     }
 
     var color1 = "";
