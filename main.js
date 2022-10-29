@@ -13,6 +13,10 @@ computer = {
 generalProcesses = [];
 pointerAccessList = [];
 
+// Time Variables
+let optimalTime = 0;
+let algorithmTime = 0;
+
 
 // ----------------------- User Algorithm -----------------------
 

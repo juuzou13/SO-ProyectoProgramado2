@@ -8,7 +8,7 @@ async function pageFaultOptimal(selectedPage){
     
     
     if(frameToInsert != -1){
-        movePageToRam(selectedPage, frameToInsert);
+        movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk);
     }else{
 
         futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
