@@ -6,7 +6,7 @@ computer = {
   ramSize: 400,
   diskSize: Number.MAX_SAFE_INTEGER,
   pageSize: 4,
-  framesQuantity: 400 / 4,
+  framesQuantity: 12 / 4,
 }
 
 // General Variables
@@ -132,7 +132,7 @@ const white = "#FFFFFF";
 let fileContents;
 
 function preload() {
-  img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
+  //img = loadImage('https://i.redd.it/ytbssa5z6pn61.png');
   fileContents = loadStrings("procesos.txt");
 }
 
@@ -159,18 +159,25 @@ async function setup() {
   mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 150);
   mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 150);
   
-  await mainProgram(fileContents, "Aging");
+  await mainProgram(fileContents);
 
+}
+
+function sumTimeToPagesInRam(ram, time){
+  for (let i = 0; i < ram.length; i++) {
+    if (ram[i].loaded != false) {
+      ram[i].loadedTime += time;
+    }
+  }
 }
 
 async function startExecution(algorithm){
 
-  if (algorithm == "Aging"){
-    markAgingLoop();
-  }
-
   while(pointerAccessList.length > 0){
-
+      await new Promise(r => setTimeout(r, 1000));
+      optimalTime = 0;
+      algorithmTime = 0;
+      
       selectedProcess = pointerAccessList[0];
 
       pN = await getPointerPages(selectedProcess, ramPagesOpt);
@@ -187,7 +194,7 @@ async function startExecution(algorithm){
         } else if (algorithm=="Second Chance"){
           // await Promise.all([optimalProcess(pageNumber), secondChanceProcess(pageNumber)]);
         } else if (algorithm=="Aging"){
-          await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
+          // await Promise.all([optimalProcess(pageNumber), agingProcess(pageNumber)]);
         } else if (algorithm=="Random"){
           // await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
         } else {
@@ -196,6 +203,13 @@ async function startExecution(algorithm){
       }
       
       await new Promise(r => setTimeout(r, 1000));
+      //print("Page numbers 1: " + pageNumbers);
+      
+      optimalTime += 1;
+      algorithmTime += 1;
+
+      sumTimeToPagesInRam(ramPagesOpt, optimalTime);
+      sumTimeToPagesInRam(ramPagesAlg, algorithmTime);
 
       pointerAccessList.shift();
 
@@ -222,7 +236,7 @@ async function mainProgram(fileContents, algorithm){
 function draw() {
   background(255);
   imageMode(CENTER);
-  image(img, 200, 600, 350, 250);
+  //image(img, 200, 600, 350, 250);
   showRAM("RAM - OPT", optimalRAM, 0);
   showRAM("RAM - ALG", algorithmRAM, 60);
   mmuOpt.html(generateHtmlTableInfo("MMU - OPT", ramPagesOpt));
