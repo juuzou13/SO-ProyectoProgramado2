@@ -2,7 +2,51 @@ function pageHitOptimal(selectedPage){
     print("Page hit");
 }
 
-async function pageFaultOptimal(selectedPage){
+function getLongestPageInRam(ram){
+  let longestPage = ram[0];
+  for(let i = 0; i < ram.length; i++){
+    if(ram[i].loadedTime > longestPage.loadedTime){
+      longestPage = ram[i];
+    }
+  }
+  return longestPage.pageId;
+}
+
+function getFrameFromPage(pageNumber, ram){
+  for(let i = 0; i < ram.length; i++){
+    if(ram[i].pageID == pageNumber){
+      return i;
+    }
+  }
+  return -1;
+}
+
+function getLongestTimeInRamFromList(pageList, ram){
+  let longestTime = 0;
+  let longestPage = -1;
+  for(let i = 0; i < pageList.length; i++){
+    let page = pageList[i];
+    let frame = getFrameFromPage(page, optimalRAM);
+    if(frame != -1){
+      if(ram[frame].loadedTime >= longestTime){
+        longestTime = ram[frame].loadedTime;
+        longestPage = page;
+      }
+    }
+  }
+  return longestPage;
+}
+
+function getPagesFromPointerList(pointerList){
+  let pages = [];
+  for(let i = 0; i < pointerList.length; i++){
+    r = getPointerPages(pointerList[i], ramPagesOpt);
+    pages = pages.concat(r);
+  }
+  return pages;
+}
+
+async function pageFaultOptimal(selectedPage, exclusionList){
     print("Page fault");
     frameToInsert = getFreeFrame(optimalRAM);
     
@@ -11,50 +55,77 @@ async function pageFaultOptimal(selectedPage){
         movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);
     }else{
 
-        futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
-        //print("Future pointers: " + futurePointers);
 
-        pagesToCheck = [];
-        for(let i = 0; i < futurePointers.length; i++){
-            pN = await getPointerPages(futurePointers[i], ramPagesOpt);
-            k = pN.slice()
+        let futurePointers = pointerAccessList.slice(1, pointerAccessList.length);
+        let k = getPagesFromPointerList(futurePointers);
+        print("future pages", k)
+        let referenceString = k;
 
-            pagesToCheck = pagesToCheck.concat(k);
-        }
-        print("Page string: " + pagesToCheck);
-        //await new Promise(r => setTimeout(r, 2000));
-        /*
-        print(pageString)
-        
-        /*
-        pagesInMemory = optimalRAM.map((page) => page.pageID);
+        let pagesInRam = optimalRAM.map((page) => page.pageID);
+        let PR = pagesInRam.slice();
 
-        counts = [];
+        let amountOfPagesInRam = PR.length;
 
-        for(let i = 0; i < pagesInMemory.length; i++){
+        let pageToLookIntoFuture;
 
-            currPageID = pagesInMemory[i];
+        let latterPage = 0;
+        let cyclesUntilCalled = 0;
 
-            pageAlreadyCounted = counts.find((count) => count.pageID == currPageID);
+        let haveFoundNonRefPage = 0;
 
-            if(!pageAlreadyCounted){
-                currPageCount = pageString.filter((pageID) => pageID == currPageID).length;
-                currCount = {pageID: currPageID, count: currPageCount};
-                counts.push(currCount);
+        let mostCyclesUntilCalled = 0;
+
+        let pagesNeverReferencedAgain = [];
+
+        for (let i = 0; i < amountOfPagesInRam; i++) {
+
+
+          pageToLookIntoFuture = PR[i];
+          cyclesUntilCalled = -1;
+
+          for (let j = 0; j < referenceString.length; j++) {
+            if (pageToLookIntoFuture == referenceString[j]) {
+              cyclesUntilCalled = j;
+              break;
             }
+          }
+
+          if (cyclesUntilCalled == -1) {
+            haveFoundNonRefPage = 1
+            pagesNeverReferencedAgain.push(pageToLookIntoFuture)
+          }
+
+          if (!haveFoundNonRefPage) {
+            if (cyclesUntilCalled > mostCyclesUntilCalled) {
+              mostCyclesUntilCalled = cyclesUntilCalled;
+              latterPage = pageToLookIntoFuture;
+            }
+          } else {
+            print("found")
+            let pagesLength = pagesNeverReferencedAgain.length;
+
+            if (pagesLength == 1) {
+              latterPage = pagesNeverReferencedAgain[0];
+            }else{
+              d = getLongestTimeInRamFromList(pagesNeverReferencedAgain.slice(), ramPagesOpt)
+              latterPage = d;
+            }
+          }
 
         }
-        leastUsedPage = counts.reduce((prev, curr) => prev.count < curr.count ? prev : curr);
-        frame = optimalRAM.find((page) => page.pageID == leastUsedPage.pageID).frameNumber;
 
-        print("Page fault");
-        print("Page to replace: " + leastUsedPage.pageID);
-        print("Page to insert: " + selectedPage);
-        print("Frame to replace it in: " + frame);
+        console.log("Page In", selectedPage)
+        frameToInsert = getFrameFromPage(latterPage, optimalRAM);
+        console.log("Page Out", latterPage, "from frame", frameToInsert)
+
+        await new Promise(r => setTimeout(r, 1000));
+
+        movePageToDisk(latterPage, ramPagesOpt, optimalDisk, optimalRAM);
+        movePageToRam(selectedPage, frameToInsert, ramPagesOpt, optimalDisk, optimalRAM);
+
         
-        movePageToDisk(leastUsedPage.pageID);
-        movePageToRam(selectedPage, frame);
-        */
+
+        
     }
 
     return 1;

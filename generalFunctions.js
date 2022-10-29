@@ -56,7 +56,7 @@ function pageExists(pageId, ram) {
   }
   
   
-  function movePageToRam(pageID, frameID, ram, disk, graphicRam){
+  function movePageToRam(pageID, frameID, ram, disk){
     
     mmuPageIndexInRam = ram.indexOf(ram.find(page => page.pageId == pageID));
   
@@ -67,12 +67,16 @@ function pageExists(pageId, ram) {
     ram[mmuPageIndexInRam].loaded = true;
     ram[mmuPageIndexInRam].mAddr = frameID;
     ram[mmuPageIndexInRam].dAddr = -1;
-    ram[mmuPageIndexInRam].loadedTime = 100;
+    ram[mmuPageIndexInRam].loadedTime = 0;
   
-    graphicRam[frameID].pageID = pageID;
-    graphicRam[frameID].color = ram[mmuPageIndexInRam].color;
+    optimalRAM[frameID].pageID = pageID;
+    optimalRAM[frameID].color = ramPagesOpt[mmuPageIndexInRam].color;
 
-
+    if(ram == ramPagesOpt){
+        optimalTime += 4;
+    }else{
+        algorithmTime += 4;
+    }
   
   }
   

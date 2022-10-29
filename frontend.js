@@ -9,7 +9,7 @@ function showRAM(title, RAM, heightPos) {
     textSize(14);
     textAlign(CENTER);
     text(title, widthMargin + width/2, heightMargin + 15);
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < computer.framesQuantity; i++) {
         fill(RAM[i].color);
         rect(widthMargin + width / 100 * i, heightMargin+20, width / 100, 18);
     }
