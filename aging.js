@@ -20,7 +20,7 @@ function pageFaultAging(selectedPage) {
     frameToInsert = getFreeFrame(algorithmRAM);
 
     if(frameToInsert != -1){
-        movePageToRam(selectedPage, frameToInsert);
+        movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk);
     }else{
 
     }

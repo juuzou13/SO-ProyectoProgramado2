@@ -56,7 +56,7 @@ function pageExists(pageId, ram) {
   }
   
   
-  function movePageToRam(pageID, frameID, ram, disk){
+  function movePageToRam(pageID, frameID, ram, disk, graphicRam){
     
     mmuPageIndexInRam = ram.indexOf(ram.find(page => page.pageId == pageID));
   
@@ -69,8 +69,8 @@ function pageExists(pageId, ram) {
     ram[mmuPageIndexInRam].dAddr = -1;
     ram[mmuPageIndexInRam].loadedTime = 100;
   
-    optimalRAM[frameID].pageID = pageID;
-    optimalRAM[frameID].color = ram[mmuPageIndexInRam].color;
+    graphicRam[frameID].pageID = pageID;
+    graphicRam[frameID].color = ram[mmuPageIndexInRam].color;
 
 
   
