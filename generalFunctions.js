@@ -50,8 +50,8 @@ async function removeProcess(pid) {
     }
   }
 
-  await removePages(pid, ramPagesOpt, optimalDisk, optimalRAM);
-  await removePages(pid, ramPagesAlg, algDisk, algorithmRAM);
+  await removePages(pid, ramPagesOpt, "optimalDisk", optimalRAM);
+  await removePages(pid, ramPagesAlg, "algDisk", algorithmRAM);
 
   ramPagesOpt = ramPagesOpt.filter(page => page.processId != pid);
   ramPagesAlg = ramPagesAlg.filter(page => page.processId != pid);
@@ -69,6 +69,13 @@ async function removePages(pid, ram, disk, graphicRam){
     } else {
       movePageToDisk(pages[i].pageId, ram, algDisk, graphicRam);
       algDisk = algDisk.filter(page => page.pageId != pages[i].pageId);
+      if (algorithm.value() == "LRU"){
+        algMarkPages = algMarkPages.filter(pageId => pageId != pages[i].pageId);
+      } else {
+        algMarkPages = algMarkPages.filter(page => page.pageId != pages[i].pageId);
+        algMarkIndex = -1;
+      }
+      
     }
   }
 }
@@ -93,7 +100,7 @@ function movePageToDisk(pageID, ram, disk, graphicRam){
 
   if(ram[mmuPageIndexInRam].loaded == true){
     addrInRam = ram[mmuPageIndexInRam].mAddr;
-    graphicRam[addrInRam].pageId = -1;
+    graphicRam[addrInRam].pageID = -1;
     graphicRam[addrInRam].color = white;
   }
 
