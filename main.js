@@ -98,6 +98,7 @@ let algorithm;
 
 let img;
 let img2;
+let backgroundImg;
 const white = "#FFFFFF";
 
 let fileContents;
@@ -105,6 +106,7 @@ let fileContents;
 function preload() {
   img = loadImage('/a.jpg');
   img2 = loadImage('/b.jpg');
+  backgroundImg = loadImage('/background.jpg');
   // fileContents = loadStrings("procesos.txt");
 }
 
@@ -254,9 +256,12 @@ async function mainProgram(fileContents, algorithm){
 
 function draw() {
   background(255);
-  textConfigs();
+  imageMode(CENTER);
+  image(backgroundImg, windowWidth/2, windowHeight/2, windowWidth, windowHeight);
+  imageMode(CORNER);
   image(img, 0, windowHeight/2, img.width/2, img.height/2);
   image(img2, windowWidth - img2.width/6, windowHeight/2, img2.width/6, img2.height/6);
+  textConfigs();
   showRAM("RAM - OPTIMAL ALG", optimalRAM, 70);
   showRAM(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmRAM, 130);
   mmuOpt.html(generateHtmlTableInfo("MMU - OPTIMAL ALG", ramPagesOpt));
