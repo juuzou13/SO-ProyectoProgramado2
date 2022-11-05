@@ -161,19 +161,16 @@ function movePageToRam(pageID, frameID, ram, disk, graphicRam){
 // ----------------------- End of move to RAM -----------------------
   
 // function assignAddress(pid, pointerID, size, color){
-async function assignAddress(){
-
-  blackList = [];
-
-  for (let i = 0; i < pointerAccessList.length; i++) {
-
-    if(!blackList.includes(pointerAccessList[i])){
-      process = generalProcesses.find(process => process.pointerOrder.includes(pointerAccessList[i]));
+let blackList = [];
+async function assignAddress(pointer){
+    print("black", blackList)
+    if(!blackList.includes(pointer)){
+      process = generalProcesses.find(process => process.pointerOrder.includes(pointer));
       index = generalProcesses.indexOf(process);
       if(index != -1){
 
         pid = generalProcesses[index].pid;
-        pointerID = pointerAccessList[i];
+        pointerID = pointer;
         size = generalProcesses[index].memoryTotal.find(pointer => pointer.pointerID == pointerID).size;
         colorId = generalProcesses[index].color;
         blackList.push(pointerID);
@@ -225,13 +222,21 @@ async function assignAddress(){
 
           movePageToDisk(availablePage, ramPagesOpt, optimalDisk);
           movePageToDisk(availablePage, ramPagesAlg, algDisk);
-          
-          if(0){
-            freeFrame = getFreeFrame(optimalRAM);
+
+          freeFrame = getFreeFrame(optimalRAM);
             
-            if(freeFrame != -1){
-              movePageToRam(availablePage, freeFrame, ramPagesOpt, optimalDisk);
-            } 
+          if(freeFrame != -1){
+            movePageToRam(availablePage, freeFrame, ramPagesOpt, optimalDisk, optimalRAM);
+            optimalTime -= 4;
+            optimalInfo.TrashingTime -= 5;
+          } 
+
+          freeFrame = getFreeFrame(algorithmRAM);
+          
+          if(freeFrame != -1){
+            movePageToRam(availablePage, freeFrame, ramPagesAlg, algDisk, algorithmRAM)
+            algorithmTime -= 4;
+            algorithmInfo.TrashingTime -= 5;
           }
 
           addresses.push({pointerID: pointerID, address: (availablePage * kbToB(computer.pageSize))});
@@ -245,7 +250,7 @@ async function assignAddress(){
         print("Error en el proceso")
       }
     }
-  }
+  
 }
 
   //ramPagesOpt.push({ pageId: 0, processId: 0, loaded: false, lAddr: 0, mAddr: -1, dAddr: 0, loadedTime: 0, mark: false, processSize: 500, color: "#16697A" })
@@ -325,7 +330,7 @@ async function loadProcesses(data){
   }
 
   await randomizepointerAccessList();
-  await assignAddress();
+  
   
   return 1;
 }

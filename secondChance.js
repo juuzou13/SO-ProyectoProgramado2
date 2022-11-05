@@ -9,7 +9,14 @@ async function secondChanceProcess(pageNumber) {
 function pageHitSecondChance(pageNumber) {
     print("Page hit Second Chance");
     let index = algMarkPages.findIndex(object => { return object.pageId === pageNumber; });
-    algMarkPages[index].chance = 1;
+    
+    markedPageExists = algMarkPages[index] != undefined;
+
+    if (markedPageExists) {
+        algMarkPages[index].chance = 1;
+    }else{
+        algMarkPages.push({pageId: pageNumber, chance: 1});
+    }
 }
 
 function pageFaultSecondChance(selectedPage) {

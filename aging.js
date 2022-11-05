@@ -6,15 +6,19 @@ async function agingProcess(pageNumber) {
     }
 }
 
+//! ESTO HAY QUE ARREGLARLO
 function pageHitAging(pageNumber) {
     print("Page hit Aging");
     if (algAuxMarkPages.includes(pageNumber) == false) {
         algAuxMarkPages.push(pageNumber);
     }
+
+    
 }
 
 function pageFaultAging(selectedPage) {
     print("Page fault Aging");
+    print("AGING",algMarkPages)
 
     frameToInsert = getFreeFrame(algorithmRAM);
 

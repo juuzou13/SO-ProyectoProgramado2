@@ -131,7 +131,13 @@ async function setup() {
 }
 
 function processFile(file) {
-  fileContents = loadStrings(file.name);
+
+    let newData = file.data.split("\n")
+    var reg = new RegExp(' ', 'g');
+    newData = newData.map((line) => line.replace(reg, ""))
+    print(newData)
+    fileContents = newData;
+
 }
 
 function textConfigs() {
@@ -186,11 +192,14 @@ async function startExecution(algorithm){
   updateLoop();
 
   while(pointerAccessList.length > 0){
+      updateLoop();
+      await assignAddress(pointerAccessList[0])
       await new Promise(r => setTimeout(r, 1000));
       optimalTime = 0;
       algorithmTime = 0;
       
       selectedProcess = pointerAccessList[0];
+      
 
       pN = await getPointerPages(selectedProcess, ramPagesOpt);
       pageNumbers = pN.slice()
