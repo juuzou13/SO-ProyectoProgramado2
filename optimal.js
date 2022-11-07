@@ -1,5 +1,5 @@
 function pageHitOptimal(selectedPage){
-    print("Page hit Optimal");
+    
 }
 
 function getLongestPageInRam(ram){
@@ -47,7 +47,7 @@ function getPagesFromPointerList(pointerList){
 }
 
 function pageFaultOptimal(selectedPage){
-    print("Page fault Optimal");
+    
     frameToInsert = getFreeFrame(optimalRAM);
     
     if(frameToInsert != -1){

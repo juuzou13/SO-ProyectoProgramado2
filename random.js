@@ -7,11 +7,11 @@ async function randomProcess(pageNumber) {
 }
 
 function pageHitRandom() {
-    print("Page hit Random");
+    
 }
 
 function pageFaultRandom(selectedPage) {
-    print("Page fault Random");
+    
     
     frameToInsert = getFreeFrame(algorithmRAM);
 

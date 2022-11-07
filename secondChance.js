@@ -7,7 +7,7 @@ async function secondChanceProcess(pageNumber) {
 }
 
 function pageHitSecondChance(pageNumber) {
-    print("Page hit Second Chance");
+    
     let index = algMarkPages.findIndex(object => { return object.pageId === pageNumber; });
     
     markedPageExists = algMarkPages[index] != undefined;
@@ -20,7 +20,7 @@ function pageHitSecondChance(pageNumber) {
 }
 
 function pageFaultSecondChance(selectedPage) {
-    print("Page fault Second Chance");
+    
     
     frameToInsert = getFreeFrame(algorithmRAM);
 

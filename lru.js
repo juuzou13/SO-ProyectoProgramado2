@@ -4,19 +4,19 @@ async function lruProcess(pageNumber) {
     } else {
         pageFaultLRU(pageNumber);
     }
-    print(" LRU array: " + algMarkPages);
+    
 
 }
 
 function pageHitLRU(pageNumber) {
-    print("Page hit LRU: ", pageNumber);
+    
     pageIndex = algMarkPages.indexOf(pageNumber); 
     algMarkPages.splice(pageIndex, 1); // remove page from array
     algMarkPages.unshift(pageNumber); // add page to the beginning of the array
 }
 
 function pageFaultLRU(selectedPage) {
-    print("Page fault LRU: " + selectedPage);
+    
     
     frameToInsert = getFreeFrame(algorithmRAM);
     

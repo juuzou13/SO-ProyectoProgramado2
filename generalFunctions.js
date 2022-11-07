@@ -41,7 +41,7 @@ async function removeProcess(pid) {
 
   await new Promise(r => setTimeout(r, 10000));
 
-  print("Removing process [" + pid + "]");
+  
 
   for(let i = 0; i < generalProcesses.length; i++){
     if(generalProcesses[i].pid == pid){
@@ -96,7 +96,7 @@ function movePageToDisk(pageID, ram, disk, graphicRam){
   mmuPageIndexInRam = ram.indexOf(ram.find(page => page.pageId == pageID));
 
   addrInRam = 0;
-  print("Moving page [" + pageID + "] index [" + mmuPageIndexInRam + "] to disk");
+  
 
   if(ram[mmuPageIndexInRam].loaded == true){
     addrInRam = ram[mmuPageIndexInRam].mAddr;
@@ -163,7 +163,6 @@ function movePageToRam(pageID, frameID, ram, disk, graphicRam){
 // function assignAddress(pid, pointerID, size, color){
 let blackList = [];
 async function assignAddress(pointer){
-    print("black", blackList)
     if(!blackList.includes(pointer)){
       process = generalProcesses.find(process => process.pointerOrder.includes(pointer));
       index = generalProcesses.indexOf(process);
@@ -247,7 +246,7 @@ async function assignAddress(pointer){
         generalProcesses[index].memoryAssigned.push(addresses);
 
       } else {
-        print("Error en el proceso")
+        
       }
     }
   
@@ -255,7 +254,7 @@ async function assignAddress(pointer){
 
   //ramPagesOpt.push({ pageId: 0, processId: 0, loaded: false, lAddr: 0, mAddr: -1, dAddr: 0, loadedTime: 0, mark: false, processSize: 500, color: "#16697A" })
   
-  //print("Pages amount for pointer [" + pointerID + "]: " + pagesAmount+" page(s)");
+  //
 
 
 function addProcess(pid, pointerID, size) {
@@ -304,13 +303,11 @@ async function randomizepointerAccessList(){
     }
   }
 
-  print("pointerAccessList",pointerAccessList);
+  
 
 }
 
 async function loadProcesses(data){
-
-  //data = ['PID, Ptr, Size', '1,   001, 12200', '1,   002, 1024', '1,   003, 512', '2,   004, 256', '2,   005, 512', '3,   006, 128', '3,   007, 1024', '3,   008, 512', '3,   009, 512', '4,   010, 256']
   
   let colHeaders = data[0].split(",");
 
