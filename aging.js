@@ -20,7 +20,6 @@ function pageHitAging(pageNumber) {
 
 function pageFaultAging(selectedPage) {
     print("Page fault Aging");
-    print("AGING",algMarkPages)
 
     frameToInsert = getFreeFrame(algorithmRAM);
 
