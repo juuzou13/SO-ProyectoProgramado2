@@ -9,11 +9,13 @@ async function agingProcess(pageNumber) {
 //! ESTO HAY QUE ARREGLARLO
 function pageHitAging(pageNumber) {
     print("Page hit Aging");
+
+    if (algMarkPages.filter(page => page.pageId == pageNumber).length == 0) {
+        algMarkPages.push({pageId: pageNumber, binary: "000000"});
+    }
     if (algAuxMarkPages.includes(pageNumber) == false) {
         algAuxMarkPages.push(pageNumber);
     }
-
-    
 }
 
 function pageFaultAging(selectedPage) {

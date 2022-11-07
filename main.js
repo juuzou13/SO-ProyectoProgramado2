@@ -104,8 +104,6 @@ const white = "#FFFFFF";
 let fileContents;
 
 function preload() {
-  img = loadImage('/a.jpg');
-  img2 = loadImage('/b.jpg');
   backgroundImg = loadImage('/background.jpg');
   // fileContents = loadStrings("procesos.txt");
 }
@@ -124,8 +122,15 @@ async function setup() {
   //   seed = 1;
   // }
 
-  mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  windowWidth * 0.15, 180);
-  mmuAlg = generateTable("MMU - ALG", ramPagesAlg, windowWidth * 0.1 + 675, 180);
+  separation = windowWidth*0.05
+  w = windowWidth*0.25
+  tw = w * 2 + separation
+  center = windowWidth/2 - tw/2
+
+  mmuOpt = generateTable("MMU - OPT", ramPagesOpt,  center, 180, w, 200);
+  mmuAlg = generateTable("MMU - ALG", ramPagesAlg, center + separation + w, 180, w, 200);
+
+  
 
   setConfig();
 }
@@ -192,17 +197,18 @@ async function startExecution(algorithm){
   updateLoop();
 
   while(pointerAccessList.length > 0){
-      updateLoop();
       await assignAddress(pointerAccessList[0])
       await new Promise(r => setTimeout(r, 1000));
       optimalTime = 0;
       algorithmTime = 0;
       
       selectedProcess = pointerAccessList[0];
+      //345345345
       
 
       pN = await getPointerPages(selectedProcess, ramPagesOpt);
       pageNumbers = pN.slice()
+
 
       for(let i = 0; i < pageNumbers.length; i++){
         
@@ -219,6 +225,8 @@ async function startExecution(algorithm){
           await Promise.all([optimalProcess(pageNumber), randomProcess(pageNumber)]);
         } else {
           await optimalProcess(pageNumber);
+
+          
         }
 
         optimalTime += 1;
@@ -241,8 +249,14 @@ async function startExecution(algorithm){
       }
 
       pointerAccessList.shift();
+      updateLoop();
   }
+  await new Promise(r => setTimeout(r, 11000));
+  window.alert("Simulación finalizada");
+  location.reload();
 }
+
+  
 
 async function mainProgram(fileContents, algorithm){
 
@@ -261,6 +275,8 @@ async function mainProgram(fileContents, algorithm){
   }else{
       window.alert("Error al leer el archivo");
   }
+  
+
 }
 
 function draw() {
@@ -268,15 +284,45 @@ function draw() {
   imageMode(CENTER);
   image(backgroundImg, windowWidth/2, windowHeight/2, windowWidth, windowHeight);
   imageMode(CORNER);
-  image(img, 0, windowHeight/2, img.width/2, img.height/2);
-  image(img2, windowWidth - img2.width/6, windowHeight/2, img2.width/6, img2.height/6);
+  //image(img, 0, windowHeight/2, img.width/2, img.height/2);
+  //image(img2, windowWidth - img2.width/6, windowHeight/2, img2.width/6, img2.height/6);
   textConfigs();
-  showRAM("RAM - OPTIMAL ALG", optimalRAM, 70);
-  showRAM(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmRAM, 130);
+
+  optRamStartY = 70
+  ramHeight = windowHeight * 0.05;
+  
+  showRAM("RAM - OPTIMAL ALG", optimalRAM, optRamStartY);
+  algRamStartY = optRamStartY + ramHeight + windowHeight * 0.02
+  showRAM(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmRAM, algRamStartY);
+
+  mmusYStart = algRamStartY + ramHeight + windowHeight * 0.02
+  
+  separation = windowWidth*0.05
+  mmusWidth = windowWidth*0.25
+  mmusHeight = windowWidth*0.15
+  combinedWidth = mmusWidth * 2 + separation
+  center = windowWidth/2 - combinedWidth/2
+
+  mmuOpt.size(mmusWidth, mmusHeight);
+  mmuAlg.size(mmusWidth, mmusHeight);
+
+  mmuOpt.position(center, mmusYStart);
+  mmuAlg.position(center + separation + mmusWidth, mmusYStart);
+
   mmuOpt.html(generateHtmlTableInfo("MMU - OPTIMAL ALG", ramPagesOpt));
   mmuAlg.html(generateHtmlTableInfo(`RAM - ${algorithm.value().toUpperCase()} ALG`, ramPagesAlg));
-  showInfoTable("MMU - OPTIMAL ALG", optimalInfo, 300, 540);
-  showInfoTable(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmInfo, 900, 540);
+
+  
+  infoTableYStart = mmusYStart + mmusHeight + windowHeight * 0.1
+
+  separation = windowWidth*0.05
+  infoTableW = windowWidth*0.25
+  combinedWidth = infoTableW * 2 + separation
+  center = windowWidth/2 - combinedWidth/2
+
+  
+  showInfoTable("MMU - OPTIMAL ALG", optimalInfo, center, infoTableYStart);
+  showInfoTable(`RAM - ${algorithm.value().toUpperCase()} ALG`, algorithmInfo, center + separation + infoTableW, infoTableYStart);
 }
 
 function sumTimeToPagesInRam(ram, time){

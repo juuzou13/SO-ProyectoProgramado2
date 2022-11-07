@@ -315,18 +315,25 @@ async function loadProcesses(data){
   let colHeaders = data[0].split(",");
 
   if(colHeaders.length != 3 || (colHeaders[0]!="PID" && colHeaders[1]!="Ptr" && colHeaders[2]!="Size")){
-    print("Error: Identificadores de columnas incorrectos");
+    window.alert("Error: Identificadores de columnas incorrectos");
     return 0;
   }
   for(let i = 1; i < data.length; i++){
-    try{
-      processInfo = data[i].split(",");
-      processInfo = processInfo.map((info) => parseInt(info.trim()));
-    }catch{
-      print("Error: Datos incorrectos en columna " + i);
-      return 0;
+
+    if(data[i]!=""){
+      try{
+        processInfo = data[i].split(",");
+        processInfo = processInfo.map((info) => parseInt(info.trim()));
+      }catch{
+        window.alert("Error: Datos incorrectos en fila " + (i+1));
+        return 0;1
+      }
+      if(processInfo.length != 3){
+        window.alert("Error: Datos incorrectos en fila " + (i+1));
+        return 0;
+      }
+      addProcess(processInfo[0], processInfo[1], processInfo[2]);
     }
-    addProcess(processInfo[0], processInfo[1], processInfo[2]);
   }
 
   await randomizepointerAccessList();

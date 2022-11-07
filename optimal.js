@@ -129,6 +129,7 @@ async function optimalProcess(pageNumber){
   }else{
     pageFaultOptimal(pageNumber);
   }
+
 }
 
 /*

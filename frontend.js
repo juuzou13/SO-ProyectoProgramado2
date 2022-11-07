@@ -4,22 +4,23 @@ function showRAM(title, RAM, heightPos) {
     width = windowWidth - widthMargin * 2;
     fill(0);
     fill(255);
-    rect(widthMargin, heightMargin, width, 20);
+    h = windowHeight * 0.05;
+    rect(widthMargin, heightMargin, width, h);
     fill(0);
     textSize(14);
     textAlign(CENTER);
     text(title, widthMargin + width/2, heightMargin + 4);
     for (let i = 0; i < computer.framesQuantity; i++) {
         fill(RAM[i].color);
-        rect(widthMargin + width / 100 * i, heightMargin+20, width / 100, 18);
+        rect(widthMargin + width / 100 * i, heightMargin+h/2, width / 100, h/2);
         fill(0);
         textSize(9);
         textAlign(LEFT);
-        text(i, widthMargin + width / 100 * i + 2, heightMargin+29);
+        text(i, widthMargin + width / 100 * i + 2, heightMargin+h/2 + (h/3)/2);
     }
 }
 
-function generateTable(title, table, widthPos, heightPos) {
+function generateTable(title, table, widthPos, heightPos,w,h) {
     html = generateHtmlTableInfo(title, table);
     divTable = createDiv("");
     divTable.position(widthPos, heightPos);
