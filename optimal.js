@@ -1,6 +1,4 @@
-function pageHitOptimal(selectedPage){
-    
-}
+function pageHitOptimal(selectedPage){}
 
 function getLongestPageInRam(ram){
   let longestPage = ram[0];
@@ -129,7 +127,6 @@ async function optimalProcess(pageNumber){
   }else{
     pageFaultOptimal(pageNumber);
   }
-
 }
 
 /*
