@@ -236,6 +236,7 @@ async function assignAddress(pointer){
             movePageToRam(availablePage, freeFrame, ramPagesAlg, algDisk, algorithmRAM)
             algorithmTime -= 4;
             algorithmInfo.TrashingTime -= 5;
+            pagesInAlgFreeFrame += 1;
           }
 
           addresses.push({pointerID: pointerID, address: (availablePage * kbToB(computer.pageSize))});

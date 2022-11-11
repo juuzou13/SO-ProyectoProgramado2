@@ -49,11 +49,14 @@ algMarkPages = [];
 algAuxMarkPages = [];
 algMarkIndex = -1;
 
-// Additional pointer
+// Circular buffer pointer
 pointer = 0
 
 // Algorithm Interval Time in seconds
 intervalTimeAlg = 8;
+
+// Counters - pages in RAM by free frame
+pagesInAlgFreeFrame = 0
 
 // ----------------------- End of User Algorithm ----------------------- //
 

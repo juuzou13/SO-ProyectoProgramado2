@@ -1,5 +1,8 @@
 async function secondChanceProcess(pageNumber) {
-    if (pageInMemory(pageNumber, algorithmRAM)) {
+    if (0 < pagesInAlgFreeFrame) {
+        pagesInAlgFreeFrame -= 1;
+        algMarkPages.push({pageId: pageNumber, chance: 0});
+    } else if (pageInMemory(pageNumber, algorithmRAM)) {
         pageHitSecondChance(pageNumber);
     } else {
         pageFaultSecondChance(pageNumber);
@@ -7,20 +10,16 @@ async function secondChanceProcess(pageNumber) {
 }
 
 function pageHitSecondChance(pageNumber) {
-    
-    let index = algMarkPages.findIndex(object => { return object.pageId === pageNumber; });
-    
-    markedPageExists = algMarkPages[index] != undefined;
 
-    if (markedPageExists) {
-        algMarkPages[index].chance = 1;
-    }else{
-        algMarkPages.push({pageId: pageNumber, chance: 1});
-    }
+    let index = algMarkPages.findIndex(object => { return object.pageId === pageNumber; });
+    let indexRAM = ramPagesAlg.findIndex(object => { return object.pageId === pageNumber; });
+
+    algMarkPages[index].chance = 1;
+    ramPagesAlg[indexRAM].mark = 1;
+
 }
 
 function pageFaultSecondChance(selectedPage) {
-    
     
     frameToInsert = getFreeFrame(algorithmRAM);
 
@@ -38,11 +37,12 @@ function replacePageSecondChance(selectedPage) {
         if(!algMarkPages[pointer].chance) {
             frameToInsert = movePageToDisk(algMarkPages[pointer].pageId, ramPagesAlg, algDisk, algorithmRAM);
             movePageToRam(selectedPage, frameToInsert, ramPagesAlg, algDisk, algorithmRAM);
-            let index = algMarkPages.findIndex(object => { return object.pageId === algMarkPages[pointer].pageId; });
-            algMarkPages[index] = {pageId: selectedPage, chance: 0};
+            algMarkPages[pointer] = {pageId: selectedPage, chance: 0};
             return (pointer + 1) % computer.framesQuantity;
         }
         algMarkPages[pointer].chance = 0;
+        let index = ramPagesAlg.findIndex(object => { return object.pageId === algMarkPages[pointer].pageId; });
+        ramPagesAlg[index].mark = 0;
         pointer = (pointer + 1) % computer.framesQuantity;
     }
 }
