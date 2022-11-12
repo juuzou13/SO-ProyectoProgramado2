@@ -1,11 +1,13 @@
 async function lruProcess(pageNumber) {
-    if (pageInMemory(pageNumber, algorithmRAM)) {
+    if (pagesInAlgFreeFrame > 0) {
+        pagesInAlgFreeFrame -= 1;
+        algMarkPages.unshift(pageNumber); 
+    }
+    else if (pageInMemory(pageNumber, algorithmRAM)) {
         pageHitLRU(pageNumber);
     } else {
         pageFaultLRU(pageNumber);
     }
-    
-
 }
 
 function pageHitLRU(pageNumber) {
